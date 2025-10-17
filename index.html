@@ -3,6 +3,14 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description" content="Secure Personal Finance Tracker - Manage your income, expenses, and savings goals">
+    <meta name="keywords" content="finance, tracker, budget, expenses, income, savings">
+    <meta name="author" content="Finance Tracker Pro">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self' 'unsafe-inline' https://cdn.jsdelivr.net https://cdnjs.cloudflare.com; style-src 'self' 'unsafe-inline' https://cdnjs.cloudflare.com; font-src 'self' https://cdnjs.cloudflare.com; img-src 'self' data:; connect-src 'self'">
+    <meta http-equiv="X-Content-Type-Options" content="nosniff">
+    <meta http-equiv="X-Frame-Options" content="DENY">
+    <meta http-equiv="Referrer-Policy" content="no-referrer">
     <title>Modern Finance Tracker Pro</title>
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
     <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
@@ -35,6 +43,9 @@
             color: #1e293b;
             display: flex;
             overflow-x: hidden;
+            scroll-behavior: smooth;
+            -webkit-font-smoothing: antialiased;
+            -moz-osx-font-smoothing: grayscale;
         }
 
         /* Modern Sidebar */
@@ -279,6 +290,11 @@
             background: white;
             box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.1);
         }
+        
+        .focused {
+            outline: 2px solid #667eea;
+            outline-offset: 2px;
+        }
 
         .btn {
             background: var(--primary-gradient);
@@ -296,6 +312,8 @@
             box-shadow: 0 4px 6px rgba(102, 126, 234, 0.2);
             position: relative;
             overflow: hidden;
+            -webkit-tap-highlight-color: transparent;
+            touch-action: manipulation;
         }
 
         .btn:hover {
@@ -649,11 +667,18 @@
             .main-content {
                 margin-left: 80px;
             }
+            
+            .section-header {
+                flex-direction: column;
+                align-items: flex-start;
+                gap: 12px;
+            }
         }
 
         @media (max-width: 768px) {
             .sidebar {
                 transform: translateX(-100%);
+                width: 280px;
             }
 
             .sidebar.mobile-open {
@@ -680,6 +705,7 @@
 
             .cards-grid {
                 grid-template-columns: 1fr;
+                gap: 16px;
             }
 
             .table-row {
@@ -690,11 +716,52 @@
 
             .quick-actions {
                 flex-direction: column;
+                width: 100%;
+            }
+            
+            .quick-actions .btn {
+                width: 100%;
+                justify-content: center;
             }
 
             .modal-content {
                 padding: 24px;
                 margin: 20px;
+                width: calc(100% - 40px);
+            }
+            
+            .chart-wrapper {
+                height: 250px;
+            }
+        }
+        
+        /* Extra small devices */
+        @media (max-width: 480px) {
+            .section-title {
+                font-size: 24px;
+            }
+            
+            .stat-value {
+                font-size: 24px;
+            }
+            
+            .card {
+                padding: 20px;
+            }
+            
+            .modal-content {
+                padding: 16px;
+            }
+            
+            .form-group label {
+                font-size: 14px;
+            }
+            
+            .form-group input,
+            .form-group select,
+            .form-group textarea {
+                padding: 12px 14px;
+                font-size: 14px;
             }
         }
 
@@ -714,6 +781,8 @@
             font-size: 20px;
             cursor: pointer;
             box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+            -webkit-tap-highlight-color: transparent;
+            touch-action: manipulation;
         }
 
         @media (max-width: 768px) {
@@ -739,9 +808,83 @@
         ::-webkit-scrollbar-thumb:hover {
             background: #a5b4fc;
         }
+        
+        /* Login Modal Styles */
+        .login-modal {
+            display: flex;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.8);
+            z-index: 2000;
+            align-items: center;
+            justify-content: center;
+            backdrop-filter: blur(5px);
+        }
+        
+        .login-content {
+            background: white;
+            border-radius: var(--border-radius);
+            padding: 36px;
+            max-width: 400px;
+            width: 90%;
+            box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.25);
+            border: 1px solid rgba(0, 0, 0, 0.1);
+            text-align: center;
+        }
+        
+        .login-content h2 {
+            margin-bottom: 24px;
+            color: #1e293b;
+            font-size: 24px;
+        }
+        
+        .login-content input {
+            width: 100%;
+            padding: 14px 18px;
+            border: 2px solid #e2e8f0;
+            border-radius: 12px;
+            font-size: 15px;
+            margin-bottom: 20px;
+            font-family: inherit;
+        }
+        
+        .login-content input:focus {
+            outline: none;
+            border-color: #667eea;
+            box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.1);
+        }
+        
+        .login-attempts {
+            color: #ef4444;
+            font-size: 14px;
+            margin-top: 10px;
+        }
+        
+        .login-timer {
+            color: #f59e0b;
+            font-size: 14px;
+            margin-top: 10px;
+        }
     </style>
 </head>
 <body>
+    <!-- Login Modal -->
+    <div id="loginModal" class="login-modal">
+        <div class="login-content">
+            <h2><i class="fas fa-lock"></i> Finance Tracker Login</h2>
+            <p style="margin-bottom: 20px; color: #64748b;">Enter password to access your financial data</p>
+            <input type="password" id="loginPassword" placeholder="Enter password (default: 149001)" autocomplete="off">
+            <button class="btn" onclick="attemptLogin()" style="width: 100%; justify-content: center;">
+                <i class="fas fa-sign-in-alt"></i> Login
+            </button>
+            <div id="loginAttempts" class="login-attempts" style="display: none;"></div>
+            <div id="loginTimer" class="login-timer" style="display: none;"></div>
+        </div>
+    </div>
+    
     <!-- Mobile Toggle Button -->
     <button class="sidebar-toggle" id="sidebarToggle">
         <i class="fas fa-bars"></i>
@@ -780,6 +923,9 @@
             </a></li>
             <li><a href="#" onclick="showSection('database')">
                 <i class="fas fa-database"></i> <span>Master Database</span>
+            </a></li>
+            <li><a href="#" onclick="logout()">
+                <i class="fas fa-sign-out-alt"></i> <span>Logout</span>
             </a></li>
         </ul>
     </div>
@@ -875,6 +1021,32 @@
             <div class="quick-actions">
                 <button class="btn btn-outline" onclick="exportAllData()">
                     <i class="fas fa-download"></i> Export Data
+                </button>
+            </div>
+            
+            <!-- Data Storage Information -->
+            <div class="card" style="margin-top: 24px;">
+                <div class="card-header">
+                    <div class="card-title">Data Storage Information</div>
+                    <div class="card-icon"><i class="fas fa-info-circle"></i></div>
+                </div>
+                <div style="margin-bottom: 16px;">
+                    <p style="color: #64748b; line-height: 1.6;">
+                        <strong>Important:</strong> Your financial data is stored locally in your browser's storage. 
+                        It will be lost if you:
+                    </p>
+                    <ul style="padding-left: 20px; color: #64748b; margin: 12px 0;">
+                        <li>Clear your browser's cache and data</li>
+                        <li>Use a different browser or device</li>
+                        <li>Switch to private/incognito mode</li>
+                    </ul>
+                    <p style="color: #64748b; line-height: 1.6;">
+                        <strong>Solution:</strong> Regularly export your data using the "Export Data" button above 
+                        and import it when needed in other browsers or devices.
+                    </p>
+                </div>
+                <button class="btn btn-warning" onclick="showDataTransferInstructions()">
+                    <i class="fas fa-question-circle"></i> How to Transfer Data
                 </button>
             </div>
         </div>
@@ -1469,7 +1641,7 @@
                     <div class="card-header">
                         <div class="card-title">Data Export</div>
                     </div>
-                    <p style="margin-bottom: 16px;">Export all your financial data for backup or analysis.</p>
+                    <p style="margin-bottom: 16px;">Export all your financial data for backup or to transfer to another browser/device.</p>
                     <div class="quick-actions">
                         <button class="btn" onclick="exportAllData()">
                             <i class="fas fa-download"></i> Export JSON
@@ -1484,13 +1656,33 @@
                     <div class="card-header">
                         <div class="card-title">Data Import</div>
                     </div>
-                    <p style="margin-bottom: 16px;">Import previously exported data.</p>
+                    <p style="margin-bottom: 16px;">Import previously exported data from another browser/device.</p>
                     <div class="form-group">
                         <input type="file" id="import-file" accept=".json" style="padding: 8px;">
                     </div>
                     <button class="btn btn-outline" onclick="importData()">
                         <i class="fas fa-upload"></i> Import Data
                     </button>
+                </div>
+                
+                <div class="card">
+                    <div class="card-header">
+                        <div class="card-title">Data Transfer Instructions</div>
+                    </div>
+                    <div style="margin-bottom: 16px;">
+                        <h4 style="margin: 0 0 12px 0; color: #374151;">How to Transfer Data Between Browsers:</h4>
+                        <ol style="padding-left: 20px; margin: 0;">
+                            <li style="margin-bottom: 8px;">Click "Export JSON" in your current browser</li>
+                            <li style="margin-bottom: 8px;">Save the downloaded file to your computer</li>
+                            <li style="margin-bottom: 8px;">Open the finance tracker in the other browser/device</li>
+                            <li style="margin-bottom: 8px;">Go to this Master Database section</li>
+                            <li style="margin-bottom: 8px;">Click "Choose File" and select your saved export file</li>
+                            <li style="margin-bottom: 8px;">Click "Import Data" and confirm</li>
+                        </ol>
+                    </div>
+                    <div class="alert alert-warning">
+                        <i class="fas fa-info-circle"></i> <strong>Important:</strong> Always export your data before clearing it. The data is stored locally in your browser and will be lost if you clear your browser data.
+                    </div>
                 </div>
             </div>
 
@@ -1777,17 +1969,349 @@
     </div>
 
     <script>
+        // Security Functions
+        function sanitizeInput(input) {
+            // Basic XSS protection
+            if (typeof input !== 'string') return input;
+            return input
+                .replace(/&/g, '&amp;')
+                .replace(/</g, '&lt;')
+                .replace(/>/g, '&gt;')
+                .replace(/"/g, '&quot;')
+                .replace(/'/g, '&#x27;')
+                .replace(/\//g, '&#x2F;');
+        }
+        
+        function validateAmount(amount) {
+            // Validate that amount is a positive number
+            const num = parseFloat(amount);
+            return !isNaN(num) && num > 0 && isFinite(num);
+        }
+        
+        function validateDate(dateString) {
+            // Validate date format YYYY-MM-DD
+            const regex = /^\d{4}-\d{2}-\d{2}$/;
+            if (!regex.test(dateString)) return false;
+            
+            const date = new Date(dateString);
+            const [year, month, day] = dateString.split('-').map(Number);
+            
+            return date.getFullYear() === year && 
+                   date.getMonth() === month - 1 && 
+                   date.getDate() === day;
+        }
+        
+        // Simple data obfuscation for localStorage (not encryption, but adds a layer of obfuscation)
+        function obfuscateData(data) {
+            try {
+                const jsonString = JSON.stringify(data);
+                // Simple base64 encoding (not real encryption, but adds obfuscation)
+                return btoa(encodeURIComponent(jsonString));
+            } catch (e) {
+                console.error('Error obfuscating data:', e);
+                return null;
+            }
+        }
+        
+        function deobfuscateData(obfuscatedData) {
+            try {
+                // Simple base64 decoding
+                const decoded = decodeURIComponent(atob(obfuscatedData));
+                return JSON.parse(decoded);
+            } catch (e) {
+                console.error('Error deobfuscating data:', e);
+                return null;
+            }
+        }
+        
+        // Login System
+        const CORRECT_PASSWORD = "149001";
+        let loginAttempts = 0;
+        let lockedUntil = null;
+        const MAX_ATTEMPTS = 3;
+        const LOCKOUT_DURATION = 5 * 60 * 1000; // 5 minutes in milliseconds
+        
+        // Check if user is already logged in
+        function checkLoginStatus() {
+            const isLoggedIn = localStorage.getItem('financeTrackerLoggedIn') === 'true';
+            const loginTime = localStorage.getItem('financeTrackerLoginTime');
+            
+            if (isLoggedIn && loginTime) {
+                const currentTime = new Date().getTime();
+                const timeElapsed = currentTime - parseInt(loginTime);
+                // Session expires after 24 hours
+                if (timeElapsed < 24 * 60 * 60 * 1000) {
+                    document.getElementById('loginModal').style.display = 'none';
+                    return true;
+                } else {
+                    // Session expired, logout
+                    logout();
+                }
+            }
+            
+            // Show login modal if not logged in
+            document.getElementById('loginModal').style.display = 'flex';
+            return false;
+        }
+        
+        // Attempt to login
+        function attemptLogin() {
+            const currentTime = new Date().getTime();
+            
+            // Check if currently locked out
+            if (lockedUntil && currentTime < lockedUntil) {
+                const timeLeft = Math.ceil((lockedUntil - currentTime) / 1000);
+                showLoginTimer(timeLeft);
+                return;
+            }
+            
+            const passwordInput = document.getElementById('loginPassword');
+            const password = passwordInput.value;
+            
+            if (password === CORRECT_PASSWORD) {
+                // Successful login
+                loginAttempts = 0;
+                lockedUntil = null;
+                localStorage.setItem('financeTrackerLoggedIn', 'true');
+                localStorage.setItem('financeTrackerLoginTime', currentTime.toString());
+                document.getElementById('loginModal').style.display = 'none';
+                document.getElementById('loginAttempts').style.display = 'none';
+                document.getElementById('loginTimer').style.display = 'none';
+                passwordInput.value = '';
+                showAlert('Login successful! Welcome to Finance Tracker.', 'success');
+            } else {
+                // Failed login
+                loginAttempts++;
+                passwordInput.value = '';
+                
+                if (loginAttempts >= MAX_ATTEMPTS) {
+                    // Lock user out
+                    lockedUntil = currentTime + LOCKOUT_DURATION;
+                    showLoginTimer(LOCKOUT_DURATION / 1000);
+                    showAlert('Too many failed attempts. Please try again in 5 minutes.', 'danger');
+                } else {
+                    // Show remaining attempts
+                    const remaining = MAX_ATTEMPTS - loginAttempts;
+                    document.getElementById('loginAttempts').style.display = 'block';
+                    document.getElementById('loginAttempts').textContent = 
+                        `Incorrect password. ${remaining} attempt${remaining !== 1 ? 's' : ''} remaining.`;
+                }
+            }
+        }
+        
+        // Show login timer
+        function showLoginTimer(seconds) {
+            const timerElement = document.getElementById('loginTimer');
+            timerElement.style.display = 'block';
+            
+            const updateTimer = () => {
+                const currentTime = new Date().getTime();
+                if (lockedUntil && currentTime < lockedUntil) {
+                    const timeLeft = Math.ceil((lockedUntil - currentTime) / 1000);
+                    const minutes = Math.floor(timeLeft / 60);
+                    const seconds = timeLeft % 60;
+                    timerElement.textContent = `Locked out. Try again in ${minutes}:${seconds < 10 ? '0' : ''}${seconds}`;
+                    setTimeout(updateTimer, 1000);
+                } else {
+                    timerElement.style.display = 'none';
+                    document.getElementById('loginAttempts').style.display = 'none';
+                    lockedUntil = null;
+                }
+            };
+            
+            updateTimer();
+        }
+        
+        // Logout function
+        function logout() {
+            localStorage.removeItem('financeTrackerLoggedIn');
+            localStorage.removeItem('financeTrackerLoginTime');
+            document.getElementById('loginModal').style.display = 'flex';
+            loginAttempts = 0;
+            lockedUntil = null;
+            document.getElementById('loginAttempts').style.display = 'none';
+            document.getElementById('loginTimer').style.display = 'none';
+            document.getElementById('loginPassword').value = '';
+        }
+        
+        // Password protected action
+        function requirePassword(actionCallback, actionDescription) {
+            if (!checkLoginStatus()) {
+                showAlert('Please login first to perform this action.', 'warning');
+                return false;
+            }
+            
+            const password = prompt(`Enter password to ${actionDescription}:`);
+            if (password === CORRECT_PASSWORD) {
+                actionCallback();
+                return true;
+            } else {
+                showAlert('Incorrect password. Action cancelled.', 'danger');
+                return false;
+            }
+        }
+        
+        // Data synchronization functions
+        function backupData() {
+            const backupData = {
+                ...financeData,
+                backupDate: new Date().toISOString(),
+                version: '1.0'
+            };
+            
+            // Store in localStorage as well for quick access
+            localStorage.setItem('financeBackup', JSON.stringify(backupData));
+            
+            return backupData;
+        }
+        
+        function restoreData(backupData) {
+            if (!backupData) return false;
+            
+            try {
+                financeData = {
+                    incomes: backupData.incomes || [],
+                    expenses: backupData.expenses || [],
+                    subscriptions: backupData.subscriptions || [],
+                    goals: backupData.goals || [],
+                    accounts: backupData.accounts || []
+                };
+                
+                saveData();
+                updateAllDisplays();
+                showAlert('Data restored successfully!', 'success');
+                return true;
+            } catch (error) {
+                console.error('Error restoring data:', error);
+                showAlert('Error restoring data. Please try again.', 'danger');
+                return false;
+            }
+        }
+        
+        function checkForBackup() {
+            // Check if there's a backup in localStorage
+            const backup = localStorage.getItem('financeBackup');
+            if (backup) {
+                try {
+                    const backupData = JSON.parse(backup);
+                    const lastBackup = new Date(backupData.backupDate);
+                    const now = new Date();
+                    const hoursDiff = Math.abs(now - lastBackup) / 36e5;
+                    
+                    // If backup is less than 24 hours old, suggest restoring
+                    if (hoursDiff < 24) {
+                        // Auto-restore if current data is empty
+                        const isEmpty = financeData.incomes.length === 0 && 
+                                       financeData.expenses.length === 0 && 
+                                       financeData.accounts.length === 0;
+                        
+                        if (isEmpty) {
+                            if (confirm('Recent backup found. Would you like to restore your data?')) {
+                                restoreData(backupData);
+                            }
+                        }
+                    }
+                } catch (e) {
+                    console.error('Error checking backup:', e);
+                }
+            }
+        }
+        
         // Global Data Storage
         let financeData = {
-            incomes: JSON.parse(localStorage.getItem('financeIncomes')) || [],
-            expenses: JSON.parse(localStorage.getItem('financeExpenses')) || [],
-            subscriptions: JSON.parse(localStorage.getItem('financeSubscriptions')) || [],
-            goals: JSON.parse(localStorage.getItem('financeGoals')) || [],
-            accounts: JSON.parse(localStorage.getItem('financeAccounts')) || []
+            incomes: (function() {
+                const data = localStorage.getItem('financeIncomes');
+                if (data) {
+                    try {
+                        // Try to deobfuscate first
+                        const deobfuscated = deobfuscateData(data);
+                        if (deobfuscated) return deobfuscated;
+                        // Fallback to regular JSON parsing
+                        return JSON.parse(data);
+                    } catch (e) {
+                        console.error('Error loading incomes data:', e);
+                        return [];
+                    }
+                }
+                return [];
+            })(),
+            expenses: (function() {
+                const data = localStorage.getItem('financeExpenses');
+                if (data) {
+                    try {
+                        // Try to deobfuscate first
+                        const deobfuscated = deobfuscateData(data);
+                        if (deobfuscated) return deobfuscated;
+                        // Fallback to regular JSON parsing
+                        return JSON.parse(data);
+                    } catch (e) {
+                        console.error('Error loading expenses data:', e);
+                        return [];
+                    }
+                }
+                return [];
+            })(),
+            subscriptions: (function() {
+                const data = localStorage.getItem('financeSubscriptions');
+                if (data) {
+                    try {
+                        // Try to deobfuscate first
+                        const deobfuscated = deobfuscateData(data);
+                        if (deobfuscated) return deobfuscated;
+                        // Fallback to regular JSON parsing
+                        return JSON.parse(data);
+                    } catch (e) {
+                        console.error('Error loading subscriptions data:', e);
+                        return [];
+                    }
+                }
+                return [];
+            })(),
+            goals: (function() {
+                const data = localStorage.getItem('financeGoals');
+                if (data) {
+                    try {
+                        // Try to deobfuscate first
+                        const deobfuscated = deobfuscateData(data);
+                        if (deobfuscated) return deobfuscated;
+                        // Fallback to regular JSON parsing
+                        return JSON.parse(data);
+                    } catch (e) {
+                        console.error('Error loading goals data:', e);
+                        return [];
+                    }
+                }
+                return [];
+            })(),
+            accounts: (function() {
+                const data = localStorage.getItem('financeAccounts');
+                if (data) {
+                    try {
+                        // Try to deobfuscate first
+                        const deobfuscated = deobfuscateData(data);
+                        if (deobfuscated) return deobfuscated;
+                        // Fallback to regular JSON parsing
+                        return JSON.parse(data);
+                    } catch (e) {
+                        console.error('Error loading accounts data:', e);
+                        return [];
+                    }
+                }
+                return [];
+            })()
         };
 
         // Initialize the application
         function init() {
+            // Check login status first
+            if (!checkLoginStatus()) {
+                // If not logged in, show login modal and return
+                return;
+            }
+            
+            // Check for backups
+            checkForBackup();
+            
             updateClock();
             setInterval(updateClock, 1000);
             setCurrentDates();
@@ -1798,6 +2322,9 @@
             addKeyboardSupport();
             startRealTimeUpdates();
             setupMobileToggle();
+            
+            // Set up auto-backup
+            setInterval(backupData, 5 * 60 * 1000); // Backup every 5 minutes
         }
 
         // Mobile sidebar toggle
@@ -1819,7 +2346,53 @@
                         sidebar.classList.remove('mobile-open');
                     }
                 });
+                
+                // Add touch support for better mobile experience
+                document.addEventListener('touchstart', handleTouchStart, false);
+                document.addEventListener('touchmove', handleTouchMove, false);
             }
+        }
+        
+        // Touch handling for mobile
+        let xDown = null;
+        let yDown = null;
+        
+        function handleTouchStart(evt) {
+            const firstTouch = evt.touches[0];
+            xDown = firstTouch.clientX;
+            yDown = firstTouch.clientY;
+        }
+        
+        function handleTouchMove(evt) {
+            if (!xDown || !yDown) {
+                return;
+            }
+            
+            const xUp = evt.touches[0].clientX;
+            const yUp = evt.touches[0].clientY;
+            
+            const xDiff = xDown - xUp;
+            const yDiff = yDown - yUp;
+            
+            // Detect swipe direction
+            if (Math.abs(xDiff) > Math.abs(yDiff)) {
+                if (xDiff > 0) {
+                    // Swipe left - close sidebar if open
+                    const sidebar = document.getElementById('sidebar');
+                    if (sidebar && sidebar.classList.contains('mobile-open')) {
+                        sidebar.classList.remove('mobile-open');
+                    }
+                } else {
+                    // Swipe right - open sidebar if closed
+                    const sidebar = document.getElementById('sidebar');
+                    if (sidebar && !sidebar.classList.contains('mobile-open')) {
+                        sidebar.classList.add('mobile-open');
+                    }
+                }
+            }
+            
+            xDown = null;
+            yDown = null;
         }
 
         // Real-time clock
@@ -1862,6 +2435,12 @@
             // Add active class to clicked nav item
             event.target.classList.add('active');
             
+            // Scroll to top smoothly
+            window.scrollTo({
+                top: 0,
+                behavior: 'smooth'
+            });
+            
             // Update section-specific data
             updateSectionData(sectionId);
         }
@@ -1900,25 +2479,81 @@
             }
         }
 
-        // Save data to localStorage
+        // Save data to localStorage with obfuscation
         function saveData() {
-            localStorage.setItem('financeIncomes', JSON.stringify(financeData.incomes));
-            localStorage.setItem('financeExpenses', JSON.stringify(financeData.expenses));
-            localStorage.setItem('financeSubscriptions', JSON.stringify(financeData.subscriptions));
-            localStorage.setItem('financeGoals', JSON.stringify(financeData.goals));
-            localStorage.setItem('financeAccounts', JSON.stringify(financeData.accounts));
+            // Sanitize all data before saving
+            const sanitizedData = {
+                incomes: financeData.incomes.map(income => ({
+                    ...income,
+                    source: sanitizeInput(income.source),
+                    description: sanitizeInput(income.description),
+                    accountName: sanitizeInput(income.accountName)
+                })),
+                expenses: financeData.expenses.map(expense => ({
+                    ...expense,
+                    category: sanitizeInput(expense.category),
+                    description: sanitizeInput(expense.description),
+                    accountName: sanitizeInput(expense.accountName)
+                })),
+                subscriptions: financeData.subscriptions.map(subscription => ({
+                    ...subscription,
+                    name: sanitizeInput(subscription.name),
+                    accountName: sanitizeInput(subscription.accountName),
+                    category: sanitizeInput(subscription.category)
+                })),
+                goals: financeData.goals.map(goal => ({
+                    ...goal,
+                    name: sanitizeInput(goal.name)
+                })),
+                accounts: financeData.accounts.map(account => ({
+                    ...account,
+                    name: sanitizeInput(account.name),
+                    institution: sanitizeInput(account.institution),
+                    type: sanitizeInput(account.type)
+                }))
+            };
+            
+            localStorage.setItem('financeIncomes', obfuscateData(sanitizedData.incomes) || JSON.stringify(sanitizedData.incomes));
+            localStorage.setItem('financeExpenses', obfuscateData(sanitizedData.expenses) || JSON.stringify(sanitizedData.expenses));
+            localStorage.setItem('financeSubscriptions', obfuscateData(sanitizedData.subscriptions) || JSON.stringify(sanitizedData.subscriptions));
+            localStorage.setItem('financeGoals', obfuscateData(sanitizedData.goals) || JSON.stringify(sanitizedData.goals));
+            localStorage.setItem('financeAccounts', obfuscateData(sanitizedData.accounts) || JSON.stringify(sanitizedData.accounts));
+            
+            // Update backup
+            backupData();
         }
 
         // Income functions
         function addIncome() {
-            const source = document.getElementById('income-source').value;
+            const source = sanitizeInput(document.getElementById('income-source').value);
             const amount = parseFloat(document.getElementById('income-amount').value);
             const date = document.getElementById('income-date').value;
             const accountId = document.getElementById('income-account').value;
-            const description = document.getElementById('income-description').value;
+            const description = sanitizeInput(document.getElementById('income-description').value);
 
-            if (!amount || amount <= 0) {
+            // Validate inputs
+            if (!source) {
+                alert('Please select a source');
+                return;
+            }
+
+            if (!validateAmount(amount)) {
                 alert('Please enter a valid amount');
+                return;
+            }
+
+            if (!date) {
+                alert('Please select a date');
+                return;
+            }
+
+            if (!validateDate(date)) {
+                alert('Please enter a valid date');
+                return;
+            }
+
+            if (!accountId) {
+                alert('Please select a bank account');
                 return;
             }
 
@@ -2007,33 +2642,56 @@
         }
 
         function deleteIncome(id) {
-            if (confirm('Are you sure you want to delete this income record?')) {
-                const income = financeData.incomes.find(inc => inc.id === id);
-                if (income && income.accountId) {
-                    // Reverse the account balance change
-                    const account = financeData.accounts.find(acc => acc.id === income.accountId);
-                    if (account) {
-                        account.balance -= income.amount;
-                        account.lastUpdated = new Date().toISOString();
+            requirePassword(() => {
+                if (confirm('Are you sure you want to delete this income record?')) {
+                    const income = financeData.incomes.find(inc => inc.id === id);
+                    if (income && income.accountId) {
+                        // Reverse the account balance change
+                        const account = financeData.accounts.find(acc => acc.id === income.accountId);
+                        if (account) {
+                            account.balance -= income.amount;
+                            account.lastUpdated = new Date().toISOString();
+                        }
                     }
+                    financeData.incomes = financeData.incomes.filter(income => income.id !== id);
+                    saveData();
+                    updateAllDisplaysRealTime();
+                    showAlert('Income record deleted and account balance updated', 'success');
                 }
-                financeData.incomes = financeData.incomes.filter(income => income.id !== id);
-                saveData();
-                updateAllDisplaysRealTime();
-                showAlert('Income record deleted and account balance updated', 'success');
-            }
+            }, 'delete income record');
         }
 
         // Expense functions
         function addExpense() {
-            const category = document.getElementById('expense-category').value;
+            const category = sanitizeInput(document.getElementById('expense-category').value);
             const amount = parseFloat(document.getElementById('expense-amount').value);
             const date = document.getElementById('expense-date').value;
             const accountId = document.getElementById('expense-account').value;
-            const description = document.getElementById('expense-description').value;
+            const description = sanitizeInput(document.getElementById('expense-description').value);
 
-            if (!amount || amount <= 0) {
+            // Validate inputs
+            if (!category) {
+                alert('Please select a category');
+                return;
+            }
+
+            if (!validateAmount(amount)) {
                 alert('Please enter a valid amount');
+                return;
+            }
+
+            if (!date) {
+                alert('Please select a date');
+                return;
+            }
+
+            if (!validateDate(date)) {
+                alert('Please enter a valid date');
+                return;
+            }
+
+            if (!accountId) {
+                alert('Please select a bank account');
                 return;
             }
 
@@ -2135,37 +2793,65 @@
         }
 
         function deleteExpense(id) {
-            if (confirm('Are you sure you want to delete this expense record?')) {
-                const expense = financeData.expenses.find(exp => exp.id === id);
-                if (expense && expense.accountId) {
-                    // Reverse the account balance change
-                    const account = financeData.accounts.find(acc => acc.id === expense.accountId);
-                    if (account) {
-                        if (account.type === 'credit') {
-                            account.balance -= expense.amount;
-                        } else {
-                            account.balance += expense.amount;
+            requirePassword(() => {
+                if (confirm('Are you sure you want to delete this expense record?')) {
+                    const expense = financeData.expenses.find(exp => exp.id === id);
+                    if (expense && expense.accountId) {
+                        // Reverse the account balance change
+                        const account = financeData.accounts.find(acc => acc.id === expense.accountId);
+                        if (account) {
+                            if (account.type === 'credit') {
+                                account.balance -= expense.amount;
+                            } else {
+                                account.balance += expense.amount;
+                            }
+                            account.lastUpdated = new Date().toISOString();
                         }
-                        account.lastUpdated = new Date().toISOString();
                     }
+                    financeData.expenses = financeData.expenses.filter(expense => expense.id !== id);
+                    saveData();
+                    updateAllDisplaysRealTime();
+                    showAlert('Expense record deleted and account balance updated', 'success');
                 }
-                financeData.expenses = financeData.expenses.filter(expense => expense.id !== id);
-                saveData();
-                updateAllDisplaysRealTime();
-                showAlert('Expense record deleted and account balance updated', 'success');
-            }
+            }, 'delete expense record');
         }
 
         // Subscription functions
         function addSubscription() {
-            const name = document.getElementById('subscription-name').value;
+            const name = sanitizeInput(document.getElementById('subscription-name').value);
             const cost = parseFloat(document.getElementById('subscription-cost').value);
             const date = document.getElementById('subscription-date').value;
             const accountId = document.getElementById('subscription-account').value;
-            const category = document.getElementById('subscription-category').value;
+            const category = sanitizeInput(document.getElementById('subscription-category').value);
 
-            if (!name || !cost || cost <= 0) {
-                alert('Please enter valid subscription details');
+            // Validate inputs
+            if (!name) {
+                alert('Please enter a subscription name');
+                return;
+            }
+
+            if (!validateAmount(cost)) {
+                alert('Please enter a valid cost');
+                return;
+            }
+
+            if (!date) {
+                alert('Please select a payment date');
+                return;
+            }
+
+            if (!validateDate(date)) {
+                alert('Please enter a valid date');
+                return;
+            }
+
+            if (!accountId) {
+                alert('Please select a bank account');
+                return;
+            }
+
+            if (!category) {
+                alert('Please select a category');
                 return;
             }
 
@@ -2355,24 +3041,26 @@
         }
 
         function deleteSubscription(id) {
-            const subscription = financeData.subscriptions.find(sub => sub.id === id);
-            if (!subscription) return;
-            
-            let confirmMessage = `Are you sure you want to cancel the subscription for "${subscription.name}"?`;
-            if (subscription.accountId) {
-                confirmMessage += '\n\nNote: This will not refund any payments already made.';
-            }
-            
-            if (confirm(confirmMessage)) {
-                financeData.subscriptions = financeData.subscriptions.filter(sub => sub.id !== id);
-                // Also remove associated expense records for this subscription
-                financeData.expenses = financeData.expenses.filter(expense => 
-                    !(expense.category === 'subscription' && expense.description.includes(subscription.name))
-                );
-                saveData();
-                updateAllDisplaysRealTime();
-                showAlert(`Subscription for "${subscription.name}" cancelled successfully!`, 'success');
-            }
+            requirePassword(() => {
+                const subscription = financeData.subscriptions.find(sub => sub.id === id);
+                if (!subscription) return;
+                
+                let confirmMessage = `Are you sure you want to cancel the subscription for "${subscription.name}"?`;
+                if (subscription.accountId) {
+                    confirmMessage += '\n\nNote: This will not refund any payments already made.';
+                }
+                
+                if (confirm(confirmMessage)) {
+                    financeData.subscriptions = financeData.subscriptions.filter(sub => sub.id !== id);
+                    // Also remove associated expense records for this subscription
+                    financeData.expenses = financeData.expenses.filter(expense => 
+                        !(expense.category === 'subscription' && expense.description.includes(subscription.name))
+                    );
+                    saveData();
+                    updateAllDisplaysRealTime();
+                    showAlert(`Subscription for "${subscription.name}" cancelled successfully!`, 'success');
+                }
+            }, 'delete subscription');
         }
         
         // Process subscription payment manually
@@ -2431,13 +3119,29 @@
 
         // Goals functions
         function addGoal() {
-            const name = document.getElementById('goal-name').value;
+            const name = sanitizeInput(document.getElementById('goal-name').value);
             const target = parseFloat(document.getElementById('goal-target').value);
             const current = parseFloat(document.getElementById('goal-current').value) || 0;
             const date = document.getElementById('goal-date').value;
 
-            if (!name || !target || target <= 0) {
-                alert('Please enter valid goal details');
+            // Validate inputs
+            if (!name) {
+                alert('Please enter a goal name');
+                return;
+            }
+
+            if (!validateAmount(target)) {
+                alert('Please enter a valid target amount');
+                return;
+            }
+
+            if (current < 0) {
+                alert('Current amount cannot be negative');
+                return;
+            }
+
+            if (date && !validateDate(date)) {
+                alert('Please enter a valid target date');
                 return;
             }
 
@@ -2535,12 +3239,14 @@ Enter new current amount:`);
         }
 
         function deleteGoal(id) {
-            if (confirm('Are you sure you want to delete this goal?')) {
-                financeData.goals = financeData.goals.filter(goal => goal.id !== id);
-                saveData();
-                updateGoalsDisplay();
-                showAlert('Goal deleted', 'success');
-            }
+            requirePassword(() => {
+                if (confirm('Are you sure you want to delete this goal?')) {
+                    financeData.goals = financeData.goals.filter(goal => goal.id !== id);
+                    saveData();
+                    updateGoalsDisplay();
+                    showAlert('Goal deleted', 'success');
+                }
+            }, 'delete goal');
         }
 
         function addModalGoal() {
@@ -2871,24 +3577,30 @@ Enter new current amount:`);
         }
 
         function exportAllData() {
-            const exportData = {
-                ...financeData,
-                exportDate: new Date().toISOString(),
-                version: '1.0'
-            };
+            requirePassword(() => {
+                // Create backup first
+                backupData();
+                
+                const exportData = {
+                    ...financeData,
+                    exportDate: new Date().toISOString(),
+                    version: '1.0',
+                    instructions: 'To import this data in another browser:\n1. Save this file to your computer\n2. Open the finance tracker in the other browser\n3. Go to Master Database section\n4. Click "Import Data" and select this file'
+                };
 
-            const dataStr = JSON.stringify(exportData, null, 2);
-            const dataBlob = new Blob([dataStr], { type: 'application/json' });
-            const url = URL.createObjectURL(dataBlob);
-            const link = document.createElement('a');
-            link.href = url;
-            link.download = `finance-tracker-${new Date().toISOString().split('T')[0]}.json`;
-            document.body.appendChild(link);
-            link.click();
-            document.body.removeChild(link);
-            URL.revokeObjectURL(url);
-            
-            showAlert('Data exported successfully!', 'success');
+                const dataStr = JSON.stringify(exportData, null, 2);
+                const dataBlob = new Blob([dataStr], { type: 'application/json' });
+                const url = URL.createObjectURL(dataBlob);
+                const link = document.createElement('a');
+                link.href = url;
+                link.download = `finance-tracker-${new Date().toISOString().split('T')[0]}.json`;
+                document.body.appendChild(link);
+                link.click();
+                document.body.removeChild(link);
+                URL.revokeObjectURL(url);
+                
+                showAlert('Data exported successfully! Save this file to transfer your data to other browsers or devices.', 'success');
+            }, 'export data');
         }
 
         function exportCSV() {
@@ -2932,72 +3644,80 @@ Enter new current amount:`);
         }
 
         function importData() {
-            const fileInput = document.getElementById('import-file');
-            const file = fileInput.files[0];
-            
-            if (!file) {
-                alert('Please select a file to import');
-                return;
-            }
-
-            const reader = new FileReader();
-            reader.onload = function(e) {
-                try {
-                    const importedData = JSON.parse(e.target.result);
-                    
-                    if (confirm('This will replace all existing data. Are you sure you want to continue?')) {
-                        financeData = {
-                            incomes: importedData.incomes || [],
-                            expenses: importedData.expenses || [],
-                            subscriptions: importedData.subscriptions || [],
-                            goals: importedData.goals || [],
-                            accounts: importedData.accounts || []
-                        };
-                        
-                        saveData();
-                        updateAllDisplays();
-                        showAlert('Data imported successfully!', 'success');
-                    }
-                } catch (error) {
-                    alert('Invalid file format. Please select a valid JSON export file.');
+            requirePassword(() => {
+                const fileInput = document.getElementById('import-file');
+                const file = fileInput.files[0];
+                
+                if (!file) {
+                    alert('Please select a file to import');
+                    return;
                 }
-            };
-            
-            reader.readAsText(file);
+
+                const reader = new FileReader();
+                reader.onload = function(e) {
+                    try {
+                        const importedData = JSON.parse(e.target.result);
+                        
+                        if (confirm('This will replace all existing data with the imported data. Are you sure you want to continue?\n\nTip: Make sure this is a finance tracker export file before proceeding.')) {
+                            financeData = {
+                                incomes: importedData.incomes || [],
+                                expenses: importedData.expenses || [],
+                                subscriptions: importedData.subscriptions || [],
+                                goals: importedData.goals || [],
+                                accounts: importedData.accounts || []
+                            };
+                            
+                            saveData();
+                            updateAllDisplays();
+                            showAlert('Data imported successfully! Your finance data has been transferred to this browser.', 'success');
+                        }
+                    } catch (error) {
+                        alert('Invalid file format. Please select a valid finance tracker export file (JSON format).');
+                    }
+                };
+                
+                reader.readAsText(file);
+            }, 'import data');
         }
 
         // Clear data functions
         function clearAllData() {
-            if (confirm('Are you sure you want to clear ALL data? This action cannot be undone.')) {
-                financeData = {
-                    incomes: [],
-                    expenses: [],
-                    subscriptions: [],
-                    goals: [],
-                    accounts: []
-                };
-                saveData();
-                updateAllDisplays();
-                showAlert('All data cleared successfully!', 'success');
-            }
+            requirePassword(() => {
+                if (confirm('Are you sure you want to clear ALL data? This action cannot be undone.')) {
+                    financeData = {
+                        incomes: [],
+                        expenses: [],
+                        subscriptions: [],
+                        goals: [],
+                        accounts: []
+                    };
+                    saveData();
+                    updateAllDisplays();
+                    showAlert('All data cleared successfully!', 'success');
+                }
+            }, 'clear all data');
         }
 
         function clearIncomeData() {
-            if (confirm('Are you sure you want to clear all income data?')) {
-                financeData.incomes = [];
-                saveData();
-                updateAllDisplays();
-                showAlert('Income data cleared!', 'success');
-            }
+            requirePassword(() => {
+                if (confirm('Are you sure you want to clear all income data?')) {
+                    financeData.incomes = [];
+                    saveData();
+                    updateAllDisplays();
+                    showAlert('Income data cleared!', 'success');
+                }
+            }, 'clear income data');
         }
 
         function clearExpenseData() {
-            if (confirm('Are you sure you want to clear all expense data?')) {
-                financeData.expenses = [];
-                saveData();
-                updateAllDisplays();
-                showAlert('Expense data cleared!', 'success');
-            }
+            requirePassword(() => {
+                if (confirm('Are you sure you want to clear all expense data?')) {
+                    financeData.expenses = [];
+                    saveData();
+                    updateAllDisplays();
+                    showAlert('Expense data cleared!', 'success');
+                }
+            }, 'clear expense data');
         }
 
         // Modal functions
@@ -3149,17 +3869,28 @@ Enter new current amount:`);
 
         // Account functions
         function addAccount() {
-            const type = document.getElementById('account-type').value;
-            const name = document.getElementById('account-name').value;
+            const type = sanitizeInput(document.getElementById('account-type').value);
+            const name = sanitizeInput(document.getElementById('account-name').value);
             const balance = parseFloat(document.getElementById('account-balance').value);
-            const institution = document.getElementById('account-institution').value;
+            const institution = sanitizeInput(document.getElementById('account-institution').value);
 
-            if (!name || !institution) {
-                alert('Please enter account name and institution');
+            // Validate inputs
+            if (!type) {
+                alert('Please select an account type');
                 return;
             }
 
-            if (isNaN(balance)) {
+            if (!name) {
+                alert('Please enter an account name');
+                return;
+            }
+
+            if (!institution) {
+                alert('Please enter an institution name');
+                return;
+            }
+
+            if (isNaN(balance) || balance < 0) {
                 alert('Please enter a valid balance amount');
                 return;
             }
@@ -3274,24 +4005,26 @@ Enter new current amount:`);
         }
 
         function deleteAccount(id) {
-            const account = financeData.accounts.find(acc => acc.id === id);
-            if (!account) return;
-            
-            // Check if account is used in any transactions
-            const hasIncomes = financeData.incomes.some(income => income.accountId === id);
-            const hasExpenses = financeData.expenses.some(expense => expense.accountId === id);
-            
-            let confirmMessage = 'Are you sure you want to delete this account?';
-            if (hasIncomes || hasExpenses) {
-                confirmMessage += '\n\nWarning: This account is linked to existing transactions. Deleting it will not affect the transactions but they will show "No Account".';
-            }
-            
-            if (confirm(confirmMessage)) {
-                financeData.accounts = financeData.accounts.filter(account => account.id !== id);
-                saveData();
-                updateAllDisplaysRealTime();
-                showAlert('Account deleted successfully', 'success');
-            }
+            requirePassword(() => {
+                const account = financeData.accounts.find(acc => acc.id === id);
+                if (!account) return;
+                
+                // Check if account is used in any transactions
+                const hasIncomes = financeData.incomes.some(income => income.accountId === id);
+                const hasExpenses = financeData.expenses.some(expense => expense.accountId === id);
+                
+                let confirmMessage = 'Are you sure you want to delete this account?';
+                if (hasIncomes || hasExpenses) {
+                    confirmMessage += '\n\nWarning: This account is linked to existing transactions. Deleting it will not affect the transactions but they will show "No Account".';
+                }
+                
+                if (confirm(confirmMessage)) {
+                    financeData.accounts = financeData.accounts.filter(account => account.id !== id);
+                    saveData();
+                    updateAllDisplaysRealTime();
+                    showAlert('Account deleted successfully', 'success');
+                }
+            }, 'delete account');
         }
 
         // Utility functions
@@ -3326,6 +4059,9 @@ Enter new current amount:`);
             populateFilterDropdowns();
             populateAccountDropdowns();
             createOverviewCharts();
+            
+            // Show export reminder if user has significant data
+            showExportReminder();
         }
 
         // Real-time update function
@@ -3393,6 +4129,122 @@ Enter new current amount:`);
             
             // Update account breakdown in real-time
             updateAccountBreakdown();
+        }
+        
+        // Show export reminder
+        function showExportReminder() {
+            // Check if user has significant data and hasn't exported recently
+            const totalRecords = financeData.incomes.length + financeData.expenses.length + financeData.accounts.length;
+            
+            if (totalRecords > 10) { // If user has more than 10 records
+                const lastExport = localStorage.getItem('lastExportReminder');
+                const now = new Date().getTime();
+                
+                // Show reminder every 7 days
+                if (!lastExport || (now - parseInt(lastExport)) > (7 * 24 * 60 * 60 * 1000)) {
+                    setTimeout(() => {
+                        const reminder = `
+                            <div id="exportReminder" style="
+                                position: fixed;
+                                bottom: 20px;
+                                right: 20px;
+                                background: #fff;
+                                border-radius: 12px;
+                                padding: 20px;
+                                box-shadow: 0 10px 25px rgba(0,0,0,0.2);
+                                max-width: 350px;
+                                z-index: 1000;
+                                border-left: 4px solid #667eea;
+                            ">
+                                <div style="display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 12px;">
+                                    <h3 style="margin: 0; color: #1e293b; font-size: 18px;">Data Backup Reminder</h3>
+                                    <button onclick="closeExportReminder()" style="background: none; border: none; font-size: 20px; cursor: pointer; color: #94a3b8;">&times;</button>
+                                </div>
+                                <p style="margin: 0 0 16px 0; color: #64748b; line-height: 1.5;">
+                                    You have ${totalRecords} financial records. Remember to export your data regularly to avoid losing it when clearing browser data.
+                                </p>
+                                <div style="display: flex; gap: 10px;">
+                                    <button class="btn" onclick="exportAllData(); closeExportReminder();" style="padding: 8px 16px; font-size: 14px;">
+                                        <i class="fas fa-download"></i> Export Now
+                                    </button>
+                                    <button class="btn btn-outline" onclick="closeExportReminder()" style="padding: 8px 16px; font-size: 14px;">
+                                        Remind Me Later
+                                    </button>
+                                </div>
+                            </div>
+                        `;
+                        
+                        // Add reminder to body
+                        const reminderElement = document.createElement('div');
+                        reminderElement.innerHTML = reminder;
+                        document.body.appendChild(reminderElement);
+                    }, 5000); // Show after 5 seconds
+                }
+            }
+        }
+        
+        // Show data transfer instructions
+        function showDataTransferInstructions() {
+            const instructions = `
+                <div id="transferInstructionsModal" class="modal active" style="display: flex;">
+                    <div class="modal-content" style="max-width: 600px;">
+                        <div class="modal-header">
+                            <h2 class="modal-title">How to Transfer Your Data</h2>
+                            <button class="close-btn" onclick="closeTransferInstructions()">&times;</button>
+                        </div>
+                        <div style="margin-bottom: 20px;">
+                            <h3 style="margin: 0 0 12px 0; color: #374151;">Step-by-Step Guide:</h3>
+                            <ol style="padding-left: 20px; margin: 0 0 20px 0;">
+                                <li style="margin-bottom: 12px;">
+                                    <strong>Export Data:</strong> Click the "Export Data" button on this page or go to the Master Database section and click "Export JSON"
+                                </li>
+                                <li style="margin-bottom: 12px;">
+                                    <strong>Save File:</strong> Save the downloaded .json file to your computer (e.g., Desktop or Documents folder)
+                                </li>
+                                <li style="margin-bottom: 12px;">
+                                    <strong>Open in New Browser:</strong> Open the finance tracker in your other browser or device
+                                </li>
+                                <li style="margin-bottom: 12px;">
+                                    <strong>Import Data:</strong> Go to the Master Database section, click "Choose File", select your saved .json file, then click "Import Data"
+                                </li>
+                                <li style="margin-bottom: 12px;">
+                                    <strong>Confirm:</strong> Click "OK" when prompted to replace existing data
+                                </li>
+                            </ol>
+                            <div class="alert alert-warning">
+                                <i class="fas fa-exclamation-triangle"></i> 
+                                <strong>Important:</strong> Always export your data before clearing browser data or switching devices!
+                            </div>
+                        </div>
+                        <button class="btn" onclick="closeTransferInstructions()" style="width: 100%; justify-content: center;">
+                            <i class="fas fa-check"></i> Got It
+                        </button>
+                    </div>
+                </div>
+            `;
+            
+            // Add instructions to body
+            const instructionsElement = document.createElement('div');
+            instructionsElement.innerHTML = instructions;
+            document.body.appendChild(instructionsElement);
+        }
+        
+        // Close transfer instructions
+        function closeTransferInstructions() {
+            const modal = document.getElementById('transferInstructionsModal');
+            if (modal) {
+                modal.remove();
+            }
+        }
+        
+        // Close export reminder
+        function closeExportReminder() {
+            const reminder = document.getElementById('exportReminder');
+            if (reminder) {
+                reminder.remove();
+            }
+            // Set last reminder time
+            localStorage.setItem('lastExportReminder', new Date().getTime().toString());
         }
         
         // Update account breakdown display
@@ -4160,6 +5012,33 @@ Generated on: ${new Date().toLocaleDateString('en-IN')}
                     addAccount();
                 }
             });
+            
+            // Login form
+            document.getElementById('loginPassword')?.addEventListener('keypress', function(e) {
+                if (e.key === 'Enter') {
+                    attemptLogin();
+                }
+            });
+            
+            // Prevent form submission on Enter in textareas
+            document.querySelectorAll('textarea').forEach(textarea => {
+                textarea.addEventListener('keypress', function(e) {
+                    if (e.key === 'Enter' && !e.shiftKey) {
+                        e.preventDefault();
+                    }
+                });
+            });
+            
+            // Add focus management for accessibility
+            document.querySelectorAll('input, select, textarea, button').forEach(element => {
+                element.addEventListener('focus', function() {
+                    this.classList.add('focused');
+                });
+                
+                element.addEventListener('blur', function() {
+                    this.classList.remove('focused');
+                });
+            });
         }
 
         // Initialize the application
@@ -4169,6 +5048,7 @@ Generated on: ${new Date().toLocaleDateString('en-IN')}
         window.addEventListener('click', function(event) {
             if (event.target.classList.contains('modal')) {
                 closeModal();
+                closeTransferInstructions();
             }
         });
     </script>
