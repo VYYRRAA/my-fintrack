@@ -1,0 +1,4176 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Modern Finance Tracker Pro</title>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --primary-gradient: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            --success-gradient: linear-gradient(135deg, #10b981 0%, #059669 100%);
+            --danger-gradient: linear-gradient(135deg, #ef4444 0%, #dc2626 100%);
+            --warning-gradient: linear-gradient(135deg, #f59e0b 0%, #d97706 100%);
+            --info-gradient: linear-gradient(135deg, #3b82f6 0%, #2563eb 100%);
+            --dark-gradient: linear-gradient(135deg, #1e293b 0%, #0f172a 100%);
+            --card-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.1), 0 10px 10px -5px rgba(0, 0, 0, 0.04);
+            --hover-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.15), 0 10px 10px -5px rgba(0, 0, 0, 0.04);
+            --transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+            --border-radius: 16px;
+            --sidebar-width: 280px;
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, 'Open Sans', 'Helvetica Neue', sans-serif;
+            background: #f1f5f9;
+            min-height: 100vh;
+            color: #1e293b;
+            display: flex;
+            overflow-x: hidden;
+        }
+
+        /* Modern Sidebar */
+        .sidebar {
+            width: var(--sidebar-width);
+            background: var(--dark-gradient);
+            color: white;
+            padding: 24px 16px;
+            position: fixed;
+            height: 100vh;
+            overflow-y: auto;
+            box-shadow: var(--card-shadow);
+            z-index: 100;
+            transition: var(--transition);
+            border-right: 1px solid rgba(255, 255, 255, 0.1);
+        }
+
+        .sidebar-header {
+            margin-bottom: 32px;
+            padding: 0 8px;
+        }
+
+        .sidebar-header h1 {
+            font-size: 26px;
+            font-weight: 800;
+            margin-bottom: 8px;
+            letter-spacing: -0.5px;
+            background: linear-gradient(to right, #fff, #e2e8f0);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+
+        .sidebar-header .clock {
+            font-size: 14px;
+            opacity: 0.85;
+            font-weight: 500;
+        }
+
+        .sidebar-nav {
+            list-style: none;
+        }
+
+        .sidebar-nav li {
+            margin-bottom: 4px;
+        }
+
+        .sidebar-nav a {
+            color: rgba(255, 255, 255, 0.85);
+            text-decoration: none;
+            display: flex;
+            align-items: center;
+            padding: 14px 16px;
+            border-radius: 12px;
+            transition: var(--transition);
+            font-weight: 500;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .sidebar-nav a:hover,
+        .sidebar-nav a.active {
+            color: white;
+            background: rgba(255, 255, 255, 0.1);
+            transform: translateX(2px);
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+        }
+
+        .sidebar-nav a.active::before {
+            content: '';
+            position: absolute;
+            left: 0;
+            top: 0;
+            height: 100%;
+            width: 4px;
+            background: #667eea;
+            border-radius: 0 4px 4px 0;
+        }
+
+        .sidebar-nav i {
+            margin-right: 14px;
+            width: 22px;
+            text-align: center;
+            font-size: 18px;
+        }
+
+        .main-content {
+            margin-left: var(--sidebar-width);
+            flex: 1;
+            padding: 32px;
+            min-height: 100vh;
+            transition: var(--transition);
+        }
+
+        .section {
+            display: none;
+            animation: fadeIn 0.5s ease-out;
+        }
+
+        .section.active {
+            display: block;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(10px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        .section-header {
+            margin-bottom: 32px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            flex-wrap: wrap;
+            gap: 16px;
+        }
+
+        .section-title {
+            font-size: 36px;
+            font-weight: 800;
+            margin-bottom: 8px;
+            color: #0f172a;
+            letter-spacing: -0.5px;
+        }
+
+        .section-subtitle {
+            color: #64748b;
+            font-size: 18px;
+            font-weight: 400;
+        }
+
+        .cards-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(320px, 1fr));
+            gap: 24px;
+            margin-bottom: 32px;
+        }
+
+        .card {
+            background: white;
+            border-radius: var(--border-radius);
+            padding: 28px;
+            box-shadow: var(--card-shadow);
+            border: 1px solid rgba(0, 0, 0, 0.05);
+            transition: var(--transition);
+            position: relative;
+            overflow: hidden;
+        }
+
+        .card:hover {
+            transform: translateY(-4px);
+            box-shadow: var(--hover-shadow);
+        }
+
+        .card::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            height: 4px;
+            background: var(--primary-gradient);
+            transform: scaleX(0);
+            transform-origin: left;
+            transition: transform 0.3s ease;
+        }
+
+        .card:hover::before {
+            transform: scaleX(1);
+        }
+
+        .card-header {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            margin-bottom: 20px;
+        }
+
+        .card-title {
+            font-size: 20px;
+            font-weight: 700;
+            color: #1e293b;
+        }
+
+        .card-icon {
+            width: 50px;
+            height: 50px;
+            background: var(--primary-gradient);
+            border-radius: 16px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-size: 20px;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+        }
+
+        .stat-value {
+            font-size: 32px;
+            font-weight: 800;
+            color: #0f172a;
+            margin-bottom: 8px;
+            letter-spacing: -0.5px;
+        }
+
+        .stat-label {
+            color: #64748b;
+            font-size: 15px;
+            font-weight: 500;
+        }
+
+        .form-group {
+            margin-bottom: 24px;
+        }
+
+        .form-group label {
+            display: block;
+            margin-bottom: 10px;
+            font-weight: 600;
+            color: #334155;
+            font-size: 15px;
+        }
+
+        .form-group input,
+        .form-group select,
+        .form-group textarea {
+            width: 100%;
+            padding: 14px 18px;
+            border: 2px solid #e2e8f0;
+            border-radius: 12px;
+            font-size: 15px;
+            transition: var(--transition);
+            background: #f8fafc;
+            font-family: inherit;
+        }
+
+        .form-group input:focus,
+        .form-group select:focus,
+        .form-group textarea:focus {
+            outline: none;
+            border-color: #667eea;
+            background: white;
+            box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.1);
+        }
+
+        .btn {
+            background: var(--primary-gradient);
+            color: white;
+            padding: 14px 28px;
+            border: none;
+            border-radius: 12px;
+            cursor: pointer;
+            font-size: 15px;
+            font-weight: 600;
+            transition: var(--transition);
+            display: inline-flex;
+            align-items: center;
+            gap: 10px;
+            box-shadow: 0 4px 6px rgba(102, 126, 234, 0.2);
+            position: relative;
+            overflow: hidden;
+        }
+
+        .btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 10px 15px rgba(102, 126, 234, 0.3);
+        }
+
+        .btn:active {
+            transform: translateY(0);
+        }
+
+        .btn-secondary {
+            background: var(--success-gradient);
+            box-shadow: 0 4px 6px rgba(16, 185, 129, 0.2);
+        }
+
+        .btn-secondary:hover {
+            box-shadow: 0 10px 15px rgba(16, 185, 129, 0.3);
+        }
+
+        .btn-danger {
+            background: var(--danger-gradient);
+            box-shadow: 0 4px 6px rgba(239, 68, 68, 0.2);
+        }
+
+        .btn-danger:hover {
+            box-shadow: 0 10px 15px rgba(239, 68, 68, 0.3);
+        }
+
+        .btn-outline {
+            background: transparent;
+            color: #667eea;
+            border: 2px solid #667eea;
+            box-shadow: none;
+        }
+
+        .btn-outline:hover {
+            background: rgba(102, 126, 234, 0.1);
+            box-shadow: 0 4px 6px rgba(102, 126, 234, 0.1);
+        }
+
+        .btn-warning {
+            background: var(--warning-gradient);
+            box-shadow: 0 4px 6px rgba(245, 158, 11, 0.2);
+        }
+
+        .btn-warning:hover {
+            box-shadow: 0 10px 15px rgba(245, 158, 11, 0.3);
+        }
+
+        .table {
+            width: 100%;
+            background: white;
+            border-radius: var(--border-radius);
+            overflow: hidden;
+            box-shadow: var(--card-shadow);
+            margin-bottom: 24px;
+            border: 1px solid rgba(0, 0, 0, 0.05);
+        }
+
+        .table-header {
+            background: #f1f5f9;
+            padding: 20px 24px;
+            font-weight: 700;
+            color: #1e293b;
+            border-bottom: 1px solid #e2e8f0;
+            font-size: 16px;
+        }
+
+        .table-row {
+            display: grid;
+            padding: 18px 24px;
+            border-bottom: 1px solid #f1f5f9;
+            align-items: center;
+            transition: var(--transition);
+        }
+
+        .table-row:hover {
+            background: #f8fafc;
+        }
+
+        .transaction-table .table-row {
+            grid-template-columns: 1fr 120px 120px 150px 100px 80px;
+        }
+
+        .income-table .table-row,
+        .expense-table .table-row {
+            grid-template-columns: 1fr 120px 150px 100px 80px;
+        }
+
+        .subscription-table .table-row {
+            grid-template-columns: 1fr 120px 150px 100px 120px 80px;
+        }
+
+        .goal-table .table-row {
+            grid-template-columns: 1fr 120px 120px 100px 80px;
+        }
+
+        .monthly-breakdown-table .table-row {
+            grid-template-columns: 120px 140px 120px 80px 120px;
+        }
+
+        .top-expenses-table .table-row {
+            grid-template-columns: 1fr 120px 120px 120px 80px;
+        }
+
+        .badge {
+            padding: 6px 14px;
+            border-radius: 20px;
+            font-size: 13px;
+            font-weight: 600;
+            text-align: center;
+            display: inline-block;
+            text-transform: capitalize;
+        }
+
+        .badge-income {
+            background: #dcfce7;
+            color: #15803d;
+        }
+
+        .badge-expense {
+            background: #fee2e2;
+            color: #b91c1c;
+        }
+
+        .badge-active {
+            background: #dbeafe;
+            color: #1e40af;
+        }
+
+        .badge-completed {
+            background: #dcfce7;
+            color: #15803d;
+        }
+
+        .badge-transfer {
+            background: #ede9fe;
+            color: #5b21b6;
+        }
+
+        .badge-warning {
+            background: #fef3c7;
+            color: #92400e;
+        }
+
+        .chart-container {
+            background: white;
+            border-radius: var(--border-radius);
+            padding: 28px;
+            box-shadow: var(--card-shadow);
+            margin-bottom: 24px;
+            border: 1px solid rgba(0, 0, 0, 0.05);
+        }
+
+        .chart-container h3 {
+            font-size: 20px;
+            font-weight: 700;
+            color: #1e293b;
+            margin-bottom: 20px;
+        }
+
+        .chart-wrapper {
+            position: relative;
+            height: 320px;
+        }
+
+        .progress-bar {
+            background: #e2e8f0;
+            height: 10px;
+            border-radius: 5px;
+            overflow: hidden;
+            margin-top: 10px;
+        }
+
+        .progress-fill {
+            background: var(--success-gradient);
+            height: 100%;
+            transition: width 0.5s ease;
+            border-radius: 5px;
+        }
+
+        .quick-actions {
+            display: flex;
+            gap: 16px;
+            margin-bottom: 24px;
+            flex-wrap: wrap;
+        }
+
+        .modal {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.6);
+            z-index: 1000;
+            align-items: center;
+            justify-content: center;
+            backdrop-filter: blur(5px);
+        }
+
+        .modal.active {
+            display: flex;
+            animation: modalFadeIn 0.3s ease-out;
+        }
+
+        @keyframes modalFadeIn {
+            from { opacity: 0; transform: scale(0.95); }
+            to { opacity: 1; transform: scale(1); }
+        }
+
+        .modal-content {
+            background: white;
+            border-radius: var(--border-radius);
+            padding: 36px;
+            max-width: 550px;
+            width: 90%;
+            max-height: 90vh;
+            overflow-y: auto;
+            box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.25);
+            border: 1px solid rgba(0, 0, 0, 0.1);
+        }
+
+        .modal-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 28px;
+        }
+
+        .modal-title {
+            font-size: 24px;
+            font-weight: 700;
+            color: #1e293b;
+        }
+
+        .close-btn {
+            background: none;
+            border: none;
+            font-size: 28px;
+            cursor: pointer;
+            color: #94a3b8;
+            width: 40px;
+            height: 40px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            border-radius: 50%;
+            transition: var(--transition);
+        }
+
+        .close-btn:hover {
+            background: #f1f5f9;
+            color: #64748b;
+        }
+
+        .alert {
+            padding: 20px;
+            border-radius: 12px;
+            margin-bottom: 24px;
+            border-left: 4px solid;
+            display: flex;
+            align-items: flex-start;
+            gap: 12px;
+        }
+
+        .alert i {
+            font-size: 20px;
+            margin-top: 2px;
+        }
+
+        .alert-content {
+            flex: 1;
+        }
+
+        .alert-success {
+            background: #f0fdf4;
+            border-color: #22c55e;
+            color: #15803d;
+        }
+
+        .alert-warning {
+            background: #fefce8;
+            border-color: #eab308;
+            color: #a16207;
+        }
+
+        .alert-danger {
+            background: #fef2f2;
+            border-color: #ef4444;
+            color: #dc2626;
+        }
+
+        .empty-state {
+            text-align: center;
+            padding: 80px 24px;
+            color: #94a3b8;
+        }
+
+        .empty-state i {
+            font-size: 56px;
+            margin-bottom: 20px;
+            opacity: 0.6;
+        }
+
+        .empty-state h3 {
+            font-size: 22px;
+            font-weight: 600;
+            color: #64748b;
+            margin-bottom: 12px;
+        }
+
+        .empty-state p {
+            font-size: 16px;
+            max-width: 400px;
+            margin: 0 auto;
+            line-height: 1.6;
+        }
+
+        /* Responsive Improvements */
+        @media (max-width: 1200px) {
+            .cards-grid {
+                grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            }
+        }
+
+        @media (max-width: 992px) {
+            .sidebar {
+                width: 80px;
+                padding: 24px 8px;
+            }
+            
+            .sidebar-header h1 span,
+            .sidebar-header .clock,
+            .sidebar-nav a span {
+                display: none;
+            }
+            
+            .sidebar-nav a {
+                justify-content: center;
+                padding: 16px;
+            }
+            
+            .sidebar-nav i {
+                margin-right: 0;
+                font-size: 20px;
+            }
+            
+            .main-content {
+                margin-left: 80px;
+            }
+        }
+
+        @media (max-width: 768px) {
+            .sidebar {
+                transform: translateX(-100%);
+            }
+
+            .sidebar.mobile-open {
+                transform: translateX(0);
+            }
+
+            .main-content {
+                margin-left: 0;
+                padding: 20px;
+            }
+
+            .section-header {
+                flex-direction: column;
+                align-items: flex-start;
+            }
+
+            .section-title {
+                font-size: 28px;
+            }
+
+            .section-subtitle {
+                font-size: 16px;
+            }
+
+            .cards-grid {
+                grid-template-columns: 1fr;
+            }
+
+            .table-row {
+                grid-template-columns: 1fr !important;
+                gap: 12px;
+                padding: 16px;
+            }
+
+            .quick-actions {
+                flex-direction: column;
+            }
+
+            .modal-content {
+                padding: 24px;
+                margin: 20px;
+            }
+        }
+
+        /* Toggle button for mobile */
+        .sidebar-toggle {
+            display: none;
+            position: fixed;
+            top: 20px;
+            left: 20px;
+            z-index: 99;
+            background: var(--primary-gradient);
+            color: white;
+            border: none;
+            width: 50px;
+            height: 50px;
+            border-radius: 50%;
+            font-size: 20px;
+            cursor: pointer;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+        }
+
+        @media (max-width: 768px) {
+            .sidebar-toggle {
+                display: block;
+            }
+        }
+
+        /* Custom scrollbar */
+        ::-webkit-scrollbar {
+            width: 8px;
+        }
+
+        ::-webkit-scrollbar-track {
+            background: #f1f5f9;
+        }
+
+        ::-webkit-scrollbar-thumb {
+            background: #c7d2fe;
+            border-radius: 4px;
+        }
+
+        ::-webkit-scrollbar-thumb:hover {
+            background: #a5b4fc;
+        }
+    </style>
+</head>
+<body>
+    <!-- Mobile Toggle Button -->
+    <button class="sidebar-toggle" id="sidebarToggle">
+        <i class="fas fa-bars"></i>
+    </button>
+
+    <!-- Sidebar Navigation -->
+    <div class="sidebar" id="sidebar">
+        <div class="sidebar-header">
+            <h1><i class="fas fa-wallet"></i> <span>Finance Pro</span></h1>
+            <div class="clock" id="clock"></div>
+        </div>
+        <ul class="sidebar-nav">
+            <li><a href="#" onclick="showSection('overview')" class="active">
+                <i class="fas fa-chart-pie"></i> <span>Overview</span>
+            </a></li>
+            <li><a href="#" onclick="showSection('account')">
+                <i class="fas fa-university"></i> <span>Account</span>
+            </a></li>
+            <li><a href="#" onclick="showSection('incomes')">
+                <i class="fas fa-arrow-up"></i> <span>Incomes</span>
+            </a></li>
+            <li><a href="#" onclick="showSection('expenses')">
+                <i class="fas fa-arrow-down"></i> <span>Expenses</span>
+            </a></li>
+            <li><a href="#" onclick="showSection('transactions')">
+                <i class="fas fa-exchange-alt"></i> <span>Transactions</span>
+            </a></li>
+            <li><a href="#" onclick="showSection('subscriptions')">
+                <i class="fas fa-sync-alt"></i> <span>Subscriptions</span>
+            </a></li>
+            <li><a href="#" onclick="showSection('goals')">
+                <i class="fas fa-bullseye"></i> <span>Goals</span>
+            </a></li>
+            <li><a href="#" onclick="showSection('yearwise')">
+                <i class="fas fa-calendar-alt"></i> <span>Year-wise Analysis</span>
+            </a></li>
+            <li><a href="#" onclick="showSection('database')">
+                <i class="fas fa-database"></i> <span>Master Database</span>
+            </a></li>
+        </ul>
+    </div>
+
+    <!-- Main Content -->
+    <div class="main-content">
+        <!-- Overview Section -->
+        <div id="overview" class="section active">
+            <div class="section-header">
+                <div>
+                    <h1 class="section-title">Financial Overview</h1>
+                    <p class="section-subtitle">Your complete financial dashboard</p>
+                </div>
+                <div class="quick-actions">
+                    <button class="btn" onclick="openModal('add-income')">
+                        <i class="fas fa-plus"></i> Add Income
+                    </button>
+                    <button class="btn btn-secondary" onclick="openModal('add-expense')">
+                        <i class="fas fa-minus"></i> Add Expense
+                    </button>
+                </div>
+            </div>
+
+            <div class="cards-grid">
+                <div class="card">
+                    <div class="card-header">
+                    <div class="card-title">Total Balance</div>
+                        <div class="card-icon"><i class="fas fa-wallet"></i></div>
+                    </div>
+                    <div class="stat-value" id="total-balance">₹0</div>
+                    <div class="stat-label">All bank accounts combined</div>
+                </div>
+                
+                <div class="card">
+                    <div class="card-header">
+                        <div class="card-title">Monthly Income</div>
+                        <div class="card-icon"><i class="fas fa-arrow-up"></i></div>
+                    </div>
+                    <div class="stat-value" id="monthly-income">₹0</div>
+                    <div class="stat-label">This month</div>
+                </div>
+                
+                <div class="card">
+                    <div class="card-header">
+                        <div class="card-title">Monthly Expenses</div>
+                        <div class="card-icon"><i class="fas fa-arrow-down"></i></div>
+                    </div>
+                    <div class="stat-value" id="monthly-expenses">₹0</div>
+                    <div class="stat-label">This month</div>
+                </div>
+                
+                <div class="card">
+                    <div class="card-header">
+                        <div class="card-title">Savings Rate</div>
+                        <div class="card-icon"><i class="fas fa-percentage"></i></div>
+                    </div>
+                    <div class="stat-value" id="savings-rate">0%</div>
+                    <div class="stat-label">This month</div>
+                </div>
+            </div>
+
+            <div class="cards-grid">
+                <div class="chart-container">
+                    <h3>Income vs Expenses (6 Months)</h3>
+                    <div class="chart-wrapper">
+                        <canvas id="overview-chart"></canvas>
+                    </div>
+                </div>
+                
+                <div class="chart-container">
+                    <h3>Expense Categories</h3>
+                    <div class="chart-wrapper">
+                        <canvas id="category-chart"></canvas>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Account Balance Breakdown -->
+            <div class="card" id="account-breakdown" style="margin-bottom: 24px;">
+                <div class="card-header">
+                    <div class="card-title">Account Balance Breakdown</div>
+                    <div class="card-icon"><i class="fas fa-calculator"></i></div>
+                </div>
+                <div id="account-breakdown-content">
+                    <div class="empty-state">
+                        <i class="fas fa-university"></i>
+                        <h3>No accounts added</h3>
+                        <p>Add bank accounts to see balance breakdown</p>
+                    </div>
+                </div>
+            </div>
+
+            <div class="quick-actions">
+                <button class="btn btn-outline" onclick="exportAllData()">
+                    <i class="fas fa-download"></i> Export Data
+                </button>
+            </div>
+        </div>
+
+        <!-- Account Section -->
+        <div id="account" class="section">
+            <div class="section-header">
+                <div>
+                    <h1 class="section-title">Account Summary</h1>
+                    <p class="section-subtitle">Track your financial accounts and balances</p>
+                </div>
+                <div class="quick-actions">
+                    <button class="btn" onclick="openModal('add-account')">
+                        <i class="fas fa-plus"></i> Add Account
+                    </button>
+                    <button class="btn btn-secondary" onclick="openModal('transfer-money')">
+                        <i class="fas fa-exchange-alt"></i> Transfer Money
+                    </button>
+                </div>
+            </div>
+
+            <div class="cards-grid">
+                <div class="card">
+                    <div class="card-header">
+                        <div class="card-title">Net Worth</div>
+                        <div class="card-icon"><i class="fas fa-chart-line"></i></div>
+                    </div>
+                    <div class="stat-value" id="net-worth">₹0</div>
+                    <div class="stat-label">Total balance from all accounts</div>
+                </div>
+                
+                <div class="card">
+                    <div class="card-header">
+                        <div class="card-title">Emergency Fund</div>
+                        <div class="card-icon"><i class="fas fa-shield-alt"></i></div>
+                    </div>
+                    <div class="stat-value" id="emergency-fund">₹0</div>
+                    <div class="stat-label">6 months expenses recommended</div>
+                </div>
+            </div>
+
+            <div class="card">
+                <div class="card-header">
+                    <div class="card-title">Account Balances</div>
+                </div>
+                <div id="accounts-list">
+                    <div class="empty-state">
+                        <i class="fas fa-university"></i>
+                        <h3>No accounts added yet</h3>
+                        <p>Add your bank accounts, credit cards, and investments</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Incomes Section -->
+        <div id="incomes" class="section">
+            <div class="section-header">
+                <div>
+                    <h1 class="section-title">Income Tracking</h1>
+                    <p class="section-subtitle">Monitor all your income sources</p>
+                </div>
+                <div class="quick-actions">
+                    <button class="btn" onclick="openModal('add-income')">
+                        <i class="fas fa-plus"></i> Add Income
+                    </button>
+                </div>
+            </div>
+
+            <div class="cards-grid">
+                <div class="card">
+                    <div class="card-header">
+                        <div class="card-title">Add Income</div>
+                    </div>
+                    <div class="form-group">
+                        <label>Source</label>
+                        <select id="income-source">
+                            <option value="salary">Salary</option>
+                            <option value="freelance">Freelance</option>
+                            <option value="business">Business</option>
+                            <option value="investment">Investment Returns</option>
+                            <option value="rental">Rental Income</option>
+                            <option value="other">Other</option>
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <label>Amount (₹)</label>
+                        <input type="number" id="income-amount" placeholder="Enter amount" min="0" step="0.01">
+                    </div>
+                    <div class="form-group">
+                        <label>Date</label>
+                        <input type="date" id="income-date">
+                    </div>
+                    <div class="form-group">
+                        <label>Bank Account *</label>
+                        <select id="income-account" required>
+                            <option value="">Select Bank Account</option>
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <label>Description</label>
+                        <input type="text" id="income-description" placeholder="Optional description">
+                    </div>
+                    <button class="btn" onclick="addIncome()">
+                        <i class="fas fa-plus"></i> Add Income
+                    </button>
+                </div>
+                
+                <div class="card">
+                    <div class="card-header">
+                        <div class="card-title">Income Summary</div>
+                    </div>
+                    <div class="stat-value" id="total-income">₹0</div>
+                    <div class="stat-label">Total income this year</div>
+                    <div style="margin-top: 16px;">
+                        <div class="stat-value" style="font-size: 20px;" id="avg-monthly-income">₹0</div>
+                        <div class="stat-label">Average monthly income</div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="table income-table">
+                <div class="table-header">
+                    Recent Income Records
+                </div>
+                <div class="table-row" style="font-weight: 600; background: #f7fafc;">
+                    <div>Source & Description</div>
+                    <div>Amount</div>
+                    <div>Account</div>
+                    <div>Date</div>
+                    <div>Actions</div>
+                </div>
+                <div id="income-records">
+                    <div class="empty-state">
+                        <i class="fas fa-arrow-up"></i>
+                        <h3>No income records</h3>
+                        <p>Start by adding your first income entry</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Expenses Section -->
+        <div id="expenses" class="section">
+            <div class="section-header">
+                <div>
+                    <h1 class="section-title">Expense Tracking</h1>
+                    <p class="section-subtitle">Monitor and categorize your expenses</p>
+                </div>
+                <div class="quick-actions">
+                    <button class="btn btn-secondary" onclick="openModal('add-expense')">
+                        <i class="fas fa-minus"></i> Add Expense
+                    </button>
+                </div>
+            </div>
+
+            <div class="cards-grid">
+                <div class="card">
+                    <div class="card-header">
+                        <div class="card-title">Add Expense</div>
+                    </div>
+                    <div class="form-group">
+                        <label>Category</label>
+                        <select id="expense-category">
+                            <option value="food">Food & Dining</option>
+                            <option value="transport">Transportation</option>
+                            <option value="shopping">Shopping</option>
+                            <option value="entertainment">Entertainment</option>
+                            <option value="bills">Bills & Utilities</option>
+                            <option value="subscription">Subscriptions</option>
+                            <option value="transfer">Account Transfers</option>
+                            <option value="healthcare">Healthcare</option>
+                            <option value="education">Education</option>
+                            <option value="travel">Travel</option>
+                            <option value="other">Other</option>
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <label>Amount (₹)</label>
+                        <input type="number" id="expense-amount" placeholder="Enter amount" min="0" step="0.01">
+                    </div>
+                    <div class="form-group">
+                        <label>Date</label>
+                        <input type="date" id="expense-date">
+                    </div>
+                    <div class="form-group">
+                        <label>Bank Account *</label>
+                        <select id="expense-account" required>
+                            <option value="">Select Bank Account</option>
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <label>Description</label>
+                        <input type="text" id="expense-description" placeholder="What did you spend on?">
+                    </div>
+                    <button class="btn btn-secondary" onclick="addExpense()">
+                        <i class="fas fa-plus"></i> Add Expense
+                    </button>
+                </div>
+                
+                <div class="card">
+                    <div class="card-header">
+                        <div class="card-title">Expense Summary</div>
+                    </div>
+                    <div class="stat-value" id="total-expenses">₹0</div>
+                    <div class="stat-label">Total expenses this year</div>
+                    <div style="margin-top: 16px;">
+                        <div class="stat-value" style="font-size: 20px;" id="avg-monthly-expense">₹0</div>
+                        <div class="stat-label">Average monthly expense</div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="table expense-table">
+                <div class="table-header">
+                    Recent Expense Records
+                </div>
+                <div class="table-row" style="font-weight: 600; background: #f7fafc;">
+                    <div>Category & Description</div>
+                    <div>Amount</div>
+                    <div>Account</div>
+                    <div>Date</div>
+                    <div>Actions</div>
+                </div>
+                <div id="expense-records">
+                    <div class="empty-state">
+                        <i class="fas fa-arrow-down"></i>
+                        <h3>No expense records</h3>
+                        <p>Start by adding your first expense entry</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Transactions Section -->
+        <div id="transactions" class="section">
+            <div class="section-header">
+                <h1 class="section-title">Transaction History</h1>
+                <p class="section-subtitle">Complete record of all financial transactions</p>
+            </div>
+
+            <div class="card">
+                <div class="card-header">
+                    <div class="card-title">All Transactions</div>
+                    <div class="quick-actions">
+                        <select id="transaction-filter" onchange="filterTransactions()">
+                            <option value="all">All Transactions</option>
+                            <option value="income">Income Only</option>
+                            <option value="expense">Expenses Only</option>
+                        </select>
+                        <select id="category-filter" onchange="filterTransactions()">
+                            <option value="all">All Categories</option>
+                        </select>
+                    </div>
+                </div>
+                
+                <div class="table transaction-table">
+                <div class="table-row" style="font-weight: 600; background: #f7fafc;">
+                    <div>Description</div>
+                    <div>Category</div>
+                    <div>Amount</div>
+                    <div>Account</div>
+                    <div>Date</div>
+                    <div>Type</div>
+                </div>
+                    <div id="transaction-records">
+                        <div class="empty-state">
+                            <i class="fas fa-exchange-alt"></i>
+                            <h3>No transactions yet</h3>
+                            <p>Your income and expense records will appear here</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Subscriptions Section -->
+        <div id="subscriptions" class="section">
+            <div class="section-header">
+                <div>
+                    <h1 class="section-title">Subscription Manager</h1>
+                    <p class="section-subtitle">Track recurring payments and subscriptions</p>
+                </div>
+                <div class="quick-actions">
+                    <button class="btn" onclick="openModal('add-subscription')">
+                        <i class="fas fa-plus"></i> Add Subscription
+                    </button>
+                </div>
+            </div>
+
+            <div class="cards-grid">
+                <div class="card">
+                    <div class="card-header">
+                        <div class="card-title">Add Subscription</div>
+                    </div>
+                    <div class="form-group">
+                        <label>Service Name</label>
+                        <input type="text" id="subscription-name" placeholder="Netflix, Spotify, etc.">
+                    </div>
+                    <div class="form-group">
+                        <label>Monthly Cost (₹)</label>
+                        <input type="number" id="subscription-cost" placeholder="Enter monthly cost" min="0" step="0.01">
+                    </div>
+                    <div class="form-group">
+                        <label>Next Payment Date</label>
+                        <input type="date" id="subscription-date">
+                    </div>
+                    <div class="form-group">
+                        <label>Bank Account *</label>
+                        <select id="subscription-account" required>
+                            <option value="">Select Bank Account</option>
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <label>Category</label>
+                        <select id="subscription-category">
+                            <option value="entertainment">Entertainment</option>
+                            <option value="software">Software</option>
+                            <option value="fitness">Fitness</option>
+                            <option value="education">Education</option>
+                            <option value="news">News & Media</option>
+                            <option value="other">Other</option>
+                        </select>
+                    </div>
+                    <button class="btn" onclick="addSubscription()">
+                        <i class="fas fa-plus"></i> Add Subscription
+                    </button>
+                </div>
+                
+                <div class="card">
+                    <div class="card-header">
+                        <div class="card-title">Monthly Subscriptions</div>
+                        <div class="card-icon"><i class="fas fa-sync-alt"></i></div>
+                    </div>
+                    <div class="stat-value" id="total-subscriptions">₹0</div>
+                    <div class="stat-label">Total monthly cost</div>
+                    <div style="margin-top: 16px;">
+                        <div class="stat-value" style="font-size: 20px;" id="yearly-subscriptions">₹0</div>
+                        <div class="stat-label">Yearly subscription cost</div>
+                    </div>
+                    <div style="margin-top: 16px;">
+                        <div class="stat-value" style="font-size: 16px; color: #667eea;" id="subscription-count">0</div>
+                        <div class="stat-label">Active subscriptions</div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="table subscription-table">
+                <div class="table-header">
+                    Active Subscriptions
+                </div>
+                <div class="table-row" style="font-weight: 600; background: #f7fafc;">
+                    <div>Service</div>
+                    <div>Monthly Cost</div>
+                    <div>Account</div>
+                    <div>Category</div>
+                    <div>Next Payment</div>
+                    <div>Actions</div>
+                </div>
+                <div id="subscription-records">
+                    <div class="empty-state">
+                        <i class="fas fa-sync-alt"></i>
+                        <h3>No subscriptions tracked</h3>
+                        <p>Add your recurring subscriptions to track monthly costs</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Goals Section -->
+        <div id="goals" class="section">
+            <div class="section-header">
+                <div>
+                    <h1 class="section-title">Financial Goals</h1>
+                    <p class="section-subtitle">Set and track your savings goals</p>
+                </div>
+                <div class="quick-actions">
+                    <button class="btn" onclick="openModal('add-goal')">
+                        <i class="fas fa-plus"></i> Create Goal
+                    </button>
+                </div>
+            </div>
+
+            <div class="cards-grid">
+                <div class="card">
+                    <div class="card-header">
+                        <div class="card-title">Create Goal</div>
+                    </div>
+                    <div class="form-group">
+                        <label>Goal Name</label>
+                        <input type="text" id="goal-name" placeholder="Emergency Fund, Vacation, etc.">
+                    </div>
+                    <div class="form-group">
+                        <label>Target Amount (₹)</label>
+                        <input type="number" id="goal-target" placeholder="Enter target amount" min="0" step="0.01">
+                    </div>
+                    <div class="form-group">
+                        <label>Current Amount (₹)</label>
+                        <input type="number" id="goal-current" placeholder="Current saved amount" min="0" step="0.01" value="0">
+                    </div>
+                    <div class="form-group">
+                        <label>Target Date</label>
+                        <input type="date" id="goal-date">
+                    </div>
+                    <button class="btn" onclick="addGoal()">
+                        <i class="fas fa-plus"></i> Create Goal
+                    </button>
+                </div>
+                
+                <div class="card">
+                    <div class="card-header">
+                        <div class="card-title">Goals Overview</div>
+                    </div>
+                    <div class="stat-value" id="total-goal-target">₹0</div>
+                    <div class="stat-label">Total goal amount</div>
+                    <div style="margin-top: 16px;">
+                        <div class="stat-value" style="font-size: 20px;" id="total-goal-saved">₹0</div>
+                        <div class="stat-label">Total amount saved</div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="table goal-table">
+                <div class="table-header">
+                    Financial Goals Progress
+                </div>
+                <div class="table-row" style="font-weight: 600; background: #f7fafc;">
+                    <div>Goal Name</div>
+                    <div>Progress</div>
+                    <div>Target</div>
+                    <div>Due Date</div>
+                    <div>Actions</div>
+                </div>
+                <div id="goal-records">
+                    <div class="empty-state">
+                        <i class="fas fa-bullseye"></i>
+                        <h3>No financial goals set</h3>
+                        <p>Create your first savings goal to start tracking progress</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Year-wise Analysis Section -->
+        <div id="yearwise" class="section">
+            <div class="section-header">
+                <h1 class="section-title">Year-wise Expense Analysis</h1>
+                <p class="section-subtitle">Comprehensive yearly expense tracking and analytics</p>
+            </div>
+
+            <div class="cards-grid">
+                <div class="card">
+                    <div class="card-header">
+                        <div class="card-title">Year Selection</div>
+                    </div>
+                    <div class="form-group">
+                        <label>Select Year for Analysis</label>
+                        <select id="analysis-year" onchange="updateYearAnalysis()">
+                            <!-- Years will be populated dynamically -->
+                        </select>
+                    </div>
+                    <div class="quick-actions">
+                        <button class="btn" onclick="generateYearReport()">
+                            <i class="fas fa-file-pdf"></i> Generate Report
+                        </button>
+                        <button class="btn btn-secondary" onclick="exportYearData()">
+                            <i class="fas fa-download"></i> Export Year Data
+                        </button>
+                    </div>
+                </div>
+                
+                <div class="card">
+                    <div class="card-header">
+                        <div class="card-title">Year Summary</div>
+                        <div class="card-icon"><i class="fas fa-chart-bar"></i></div>
+                    </div>
+                    <div class="stat-value" id="year-total-expense">₹0</div>
+                    <div class="stat-label">Total expenses this year</div>
+                    <div style="margin-top: 16px;">
+                        <div class="stat-value" style="font-size: 20px;" id="year-avg-monthly">₹0</div>
+                        <div class="stat-label">Average monthly expense</div>
+                    </div>
+                    <div style="margin-top: 16px;">
+                        <div class="stat-value" style="font-size: 20px;" id="year-highest-month">--</div>
+                        <div class="stat-label">Highest expense month</div>
+                    </div>
+                </div>
+                
+                <div class="card">
+                    <div class="card-header">
+                        <div class="card-title">Category Breakdown</div>
+                        <div class="card-icon"><i class="fas fa-pie-chart"></i></div>
+                    </div>
+                    <div class="stat-value" id="year-top-category">--</div>
+                    <div class="stat-label">Top spending category</div>
+                    <div style="margin-top: 16px;">
+                        <div class="stat-value" style="font-size: 20px;" id="year-category-count">0</div>
+                        <div class="stat-label">Active categories</div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Charts Section -->
+            <div class="cards-grid">
+                <div class="chart-container">
+                    <h3>Monthly Expense Trend</h3>
+                    <div class="chart-wrapper">
+                        <canvas id="yearly-trend-chart"></canvas>
+                    </div>
+                </div>
+                
+                <div class="chart-container">
+                    <h3>Category Wise Distribution</h3>
+                    <div class="chart-wrapper">
+                        <canvas id="yearly-category-chart"></canvas>
+                    </div>
+                </div>
+            </div>
+
+            <div class="cards-grid">
+                <div class="chart-container">
+                    <h3>Year over Year Comparison</h3>
+                    <div class="chart-wrapper">
+                        <canvas id="year-comparison-chart"></canvas>
+                    </div>
+                </div>
+                
+                <div class="chart-container">
+                    <h3>Expense Forecast</h3>
+                    <div class="chart-wrapper">
+                        <canvas id="expense-forecast-chart"></canvas>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Detailed Monthly Breakdown -->
+            <div class="card">
+                <div class="card-header">
+                    <div class="card-title">Monthly Breakdown</div>
+                </div>
+                <div class="table monthly-breakdown-table">
+                    <div class="table-row" style="font-weight: 600; background: #f7fafc;">
+                        <div>Month</div>
+                        <div>Total Expenses</div>
+                        <div>Top Category</div>
+                        <div>Transactions</div>
+                        <div>vs Previous Month</div>
+                    </div>
+                    <div id="monthly-breakdown">
+                        <div class="empty-state">
+                            <i class="fas fa-calendar-alt"></i>
+                            <h3>No expense data</h3>
+                            <p>Add some expenses to see monthly breakdown</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Top Expenses Table -->
+            <div class="card">
+                <div class="card-header">
+                    <div class="card-title">Top Expenses This Year</div>
+                </div>
+                <div class="table top-expenses-table">
+                    <div class="table-row" style="font-weight: 600; background: #f7fafc;">
+                        <div>Description</div>
+                        <div>Category</div>
+                        <div>Amount</div>
+                        <div>Date</div>
+                        <div>% of Total</div>
+                    </div>
+                    <div id="top-expenses">
+                        <div class="empty-state">
+                            <i class="fas fa-receipt"></i>
+                            <h3>No expenses recorded</h3>
+                            <p>Start adding expenses to see top spending analysis</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Master Database Section -->
+        <div id="database" class="section">
+            <div class="section-header">
+                <h1 class="section-title">Master Database</h1>
+                <p class="section-subtitle">Complete overview of all financial data</p>
+            </div>
+
+            <div class="cards-grid">
+                <div class="card">
+                    <div class="card-header">
+                        <div class="card-title">Data Export</div>
+                    </div>
+                    <p style="margin-bottom: 16px;">Export all your financial data for backup or analysis.</p>
+                    <div class="quick-actions">
+                        <button class="btn" onclick="exportAllData()">
+                            <i class="fas fa-download"></i> Export JSON
+                        </button>
+                        <button class="btn btn-secondary" onclick="exportCSV()">
+                            <i class="fas fa-file-csv"></i> Export CSV
+                        </button>
+                    </div>
+                </div>
+                
+                <div class="card">
+                    <div class="card-header">
+                        <div class="card-title">Data Import</div>
+                    </div>
+                    <p style="margin-bottom: 16px;">Import previously exported data.</p>
+                    <div class="form-group">
+                        <input type="file" id="import-file" accept=".json" style="padding: 8px;">
+                    </div>
+                    <button class="btn btn-outline" onclick="importData()">
+                        <i class="fas fa-upload"></i> Import Data
+                    </button>
+                </div>
+            </div>
+
+            <div class="card">
+                <div class="card-header">
+                    <div class="card-title">Database Statistics</div>
+                </div>
+                <div class="cards-grid" style="margin: 0;">
+                    <div style="text-align: center;">
+                        <div class="stat-value" id="db-income-count">0</div>
+                        <div class="stat-label">Income Records</div>
+                    </div>
+                    <div style="text-align: center;">
+                        <div class="stat-value" id="db-expense-count">0</div>
+                        <div class="stat-label">Expense Records</div>
+                    </div>
+                    <div style="text-align: center;">
+                        <div class="stat-value" id="db-subscription-count">0</div>
+                        <div class="stat-label">Subscriptions</div>
+                    </div>
+                    <div style="text-align: center;">
+                        <div class="stat-value" id="db-goal-count">0</div>
+                        <div class="stat-label">Active Goals</div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="card">
+                <div class="card-header">
+                    <div class="card-title">Data Management</div>
+                </div>
+                <div class="alert alert-warning">
+                    <strong>⚠️ Warning:</strong> These actions cannot be undone. Please export your data before clearing.
+                </div>
+                <div class="quick-actions">
+                    <button class="btn btn-danger" onclick="clearAllData()">
+                        <i class="fas fa-trash"></i> Clear All Data
+                    </button>
+                    <button class="btn btn-danger" onclick="clearIncomeData()">
+                        <i class="fas fa-trash"></i> Clear Income Data
+                    </button>
+                    <button class="btn btn-danger" onclick="clearExpenseData()">
+                        <i class="fas fa-trash"></i> Clear Expense Data
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Modals -->
+    <div id="add-income" class="modal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h2 class="modal-title">Add Income</h2>
+                <button class="close-btn" onclick="closeModal()">&times;</button>
+            </div>
+            <div class="form-group">
+                <label>Source</label>
+                <select id="modal-income-source">
+                    <option value="salary">Salary</option>
+                    <option value="freelance">Freelance</option>
+                    <option value="business">Business</option>
+                    <option value="investment">Investment Returns</option>
+                    <option value="rental">Rental Income</option>
+                    <option value="other">Other</option>
+                </select>
+            </div>
+            <div class="form-group">
+                <label>Amount (₹)</label>
+                <input type="number" id="modal-income-amount" placeholder="Enter amount" min="0" step="0.01">
+            </div>
+            <div class="form-group">
+                <label>Date</label>
+                <input type="date" id="modal-income-date">
+            </div>
+            <div class="form-group">
+                <label>Bank Account *</label>
+                <select id="modal-income-account" required>
+                    <option value="">Select Bank Account</option>
+                </select>
+            </div>
+            <div class="form-group">
+                <label>Description</label>
+                <input type="text" id="modal-income-description" placeholder="Optional description">
+            </div>
+            <button class="btn" onclick="addModalIncome()">
+                <i class="fas fa-plus"></i> Add Income
+            </button>
+        </div>
+    </div>
+
+    <div id="add-expense" class="modal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h2 class="modal-title">Add Expense</h2>
+                <button class="close-btn" onclick="closeModal()">&times;</button>
+            </div>
+            <div class="form-group">
+                <label>Category</label>
+                        <select id="modal-expense-category">
+                            <option value="food">Food & Dining</option>
+                            <option value="transport">Transportation</option>
+                            <option value="shopping">Shopping</option>
+                            <option value="entertainment">Entertainment</option>
+                            <option value="bills">Bills & Utilities</option>
+                            <option value="subscription">Subscriptions</option>
+                            <option value="transfer">Account Transfers</option>
+                            <option value="healthcare">Healthcare</option>
+                            <option value="education">Education</option>
+                            <option value="travel">Travel</option>
+                            <option value="other">Other</option>
+                        </select>
+            </div>
+            <div class="form-group">
+                <label>Amount (₹)</label>
+                <input type="number" id="modal-expense-amount" placeholder="Enter amount" min="0" step="0.01">
+            </div>
+            <div class="form-group">
+                <label>Date</label>
+                <input type="date" id="modal-expense-date">
+            </div>
+            <div class="form-group">
+                <label>Bank Account *</label>
+                <select id="modal-expense-account" required>
+                    <option value="">Select Bank Account</option>
+                </select>
+            </div>
+            <div class="form-group">
+                <label>Description</label>
+                <input type="text" id="modal-expense-description" placeholder="What did you spend on?">
+            </div>
+            <button class="btn btn-secondary" onclick="addModalExpense()">
+                <i class="fas fa-plus"></i> Add Expense
+            </button>
+        </div>
+    </div>
+
+    <div id="add-account" class="modal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h2 class="modal-title">Add Account</h2>
+                <button class="close-btn" onclick="closeModal()">&times;</button>
+            </div>
+            <div class="form-group">
+                <label>Account Type</label>
+                <select id="account-type">
+                    <option value="savings">Savings Account</option>
+                    <option value="checking">Checking Account</option>
+                    <option value="credit">Credit Card</option>
+                    <option value="investment">Investment Account</option>
+                    <option value="loan">Loan Account</option>
+                    <option value="other">Other</option>
+                </select>
+            </div>
+            <div class="form-group">
+                <label>Account Name</label>
+                <input type="text" id="account-name" placeholder="e.g., HDFC Savings, ICICI Credit Card">
+            </div>
+            <div class="form-group">
+                <label>Current Balance (₹)</label>
+                <input type="number" id="account-balance" placeholder="Enter current balance" step="0.01">
+            </div>
+            <div class="form-group">
+                <label>Bank/Institution</label>
+                <input type="text" id="account-institution" placeholder="e.g., HDFC Bank, ICICI Bank">
+            </div>
+            <button class="btn" onclick="addAccount()">
+                <i class="fas fa-plus"></i> Add Account
+            </button>
+        </div>
+    </div>
+
+    <!-- Transfer Money Modal -->
+    <div id="transfer-money" class="modal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h2 class="modal-title">Transfer Money</h2>
+                <button class="close-btn" onclick="closeModal()">&times;</button>
+            </div>
+            <div class="form-group">
+                <label>From Account *</label>
+                <select id="transfer-from-account" required onchange="updateToAccountOptions()">
+                    <option value="">Select Source Account</option>
+                </select>
+            </div>
+            <div class="form-group">
+                <label>To Account *</label>
+                <select id="transfer-to-account" required>
+                    <option value="">Select Destination Account</option>
+                </select>
+            </div>
+            <div class="form-group">
+                <label>Transfer Amount (₹) *</label>
+                <input type="number" id="transfer-amount" placeholder="Enter amount to transfer" min="0.01" step="0.01" required>
+            </div>
+            <div class="form-group">
+                <label>Transfer Description</label>
+                <input type="text" id="transfer-description" placeholder="Optional description (e.g., Emergency fund, Bill payment)">
+            </div>
+            <div id="transfer-summary" style="display: none; margin-top: 16px; padding: 16px; background: #f8fafc; border-radius: 12px; border-left: 4px solid #667eea;">
+                <h4 style="margin: 0 0 8px 0; color: #374151;">Transfer Summary</h4>
+                <div id="transfer-details"></div>
+            </div>
+            <div style="display: flex; gap: 12px; margin-top: 20px;">
+                <button class="btn btn-outline" onclick="previewTransfer()">
+                    <i class="fas fa-eye"></i> Preview Transfer
+                </button>
+                <button class="btn" onclick="executeTransfer()">
+                    <i class="fas fa-exchange-alt"></i> Execute Transfer
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Add Subscription Modal -->
+    <div id="add-subscription" class="modal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h2 class="modal-title">Add Subscription</h2>
+                <button class="close-btn" onclick="closeModal()">&times;</button>
+            </div>
+            <div class="form-group">
+                <label>Service Name</label>
+                <input type="text" id="modal-subscription-name" placeholder="Netflix, Spotify, etc.">
+            </div>
+            <div class="form-group">
+                <label>Monthly Cost (₹)</label>
+                <input type="number" id="modal-subscription-cost" placeholder="Enter monthly cost" min="0" step="0.01">
+            </div>
+            <div class="form-group">
+                <label>Next Payment Date</label>
+                <input type="date" id="modal-subscription-date">
+            </div>
+            <div class="form-group">
+                <label>Bank Account *</label>
+                <select id="modal-subscription-account" required>
+                    <option value="">Select Bank Account</option>
+                </select>
+            </div>
+            <div class="form-group">
+                <label>Category</label>
+                <select id="modal-subscription-category">
+                    <option value="entertainment">Entertainment</option>
+                    <option value="software">Software</option>
+                    <option value="fitness">Fitness</option>
+                    <option value="education">Education</option>
+                    <option value="news">News & Media</option>
+                    <option value="other">Other</option>
+                </select>
+            </div>
+            <button class="btn" onclick="addModalSubscription()">
+                <i class="fas fa-plus"></i> Add Subscription
+            </button>
+        </div>
+    </div>
+
+    <!-- Add Goal Modal -->
+    <div id="add-goal" class="modal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h2 class="modal-title">Create Financial Goal</h2>
+                <button class="close-btn" onclick="closeModal()">&times;</button>
+            </div>
+            <div class="form-group">
+                <label>Goal Name</label>
+                <input type="text" id="modal-goal-name" placeholder="Emergency Fund, Vacation, etc.">
+            </div>
+            <div class="form-group">
+                <label>Target Amount (₹)</label>
+                <input type="number" id="modal-goal-target" placeholder="Enter target amount" min="0" step="0.01">
+            </div>
+            <div class="form-group">
+                <label>Current Amount (₹)</label>
+                <input type="number" id="modal-goal-current" placeholder="Current saved amount" min="0" step="0.01" value="0">
+            </div>
+            <div class="form-group">
+                <label>Target Date</label>
+                <input type="date" id="modal-goal-date">
+            </div>
+            <button class="btn" onclick="addModalGoal()">
+                <i class="fas fa-plus"></i> Create Goal
+            </button>
+        </div>
+    </div>
+
+    <script>
+        // Global Data Storage
+        let financeData = {
+            incomes: JSON.parse(localStorage.getItem('financeIncomes')) || [],
+            expenses: JSON.parse(localStorage.getItem('financeExpenses')) || [],
+            subscriptions: JSON.parse(localStorage.getItem('financeSubscriptions')) || [],
+            goals: JSON.parse(localStorage.getItem('financeGoals')) || [],
+            accounts: JSON.parse(localStorage.getItem('financeAccounts')) || []
+        };
+
+        // Initialize the application
+        function init() {
+            updateClock();
+            setInterval(updateClock, 1000);
+            setCurrentDates();
+            updateAllDisplays();
+            updateDashboard();
+            populateFilterDropdowns();
+            populateAccountDropdowns();
+            addKeyboardSupport();
+            startRealTimeUpdates();
+            setupMobileToggle();
+        }
+
+        // Mobile sidebar toggle
+        function setupMobileToggle() {
+            const toggleBtn = document.getElementById('sidebarToggle');
+            const sidebar = document.getElementById('sidebar');
+            
+            if (toggleBtn && sidebar) {
+                toggleBtn.addEventListener('click', () => {
+                    sidebar.classList.toggle('mobile-open');
+                });
+                
+                // Close sidebar when clicking outside on mobile
+                document.addEventListener('click', (e) => {
+                    if (window.innerWidth <= 768 && 
+                        !sidebar.contains(e.target) && 
+                        !toggleBtn.contains(e.target) &&
+                        sidebar.classList.contains('mobile-open')) {
+                        sidebar.classList.remove('mobile-open');
+                    }
+                });
+            }
+        }
+
+        // Real-time clock
+        function updateClock() {
+            const now = new Date();
+            document.getElementById('clock').textContent = now.toLocaleDateString('en-US', {
+                weekday: 'short',
+                month: 'short',
+                day: 'numeric',
+                hour: '2-digit',
+                minute: '2-digit'
+            });
+        }
+
+        // Set current dates in form fields
+        function setCurrentDates() {
+            const today = new Date().toISOString().split('T')[0];
+            const dateInputs = ['income-date', 'expense-date', 'subscription-date'];
+            dateInputs.forEach(id => {
+                const element = document.getElementById(id);
+                if (element) element.value = today;
+            });
+        }
+
+        // Navigation
+        function showSection(sectionId) {
+            // Hide all sections
+            document.querySelectorAll('.section').forEach(section => {
+                section.classList.remove('active');
+            });
+            
+            // Remove active class from nav items
+            document.querySelectorAll('.sidebar-nav a').forEach(link => {
+                link.classList.remove('active');
+            });
+            
+            // Show selected section
+            document.getElementById(sectionId).classList.add('active');
+            
+            // Add active class to clicked nav item
+            event.target.classList.add('active');
+            
+            // Update section-specific data
+            updateSectionData(sectionId);
+        }
+
+        // Update section-specific data
+        function updateSectionData(sectionId) {
+            switch(sectionId) {
+                case 'overview':
+                    updateDashboard();
+                    createOverviewCharts();
+                    break;
+                case 'account':
+                    updateAccountDisplay();
+                    break;
+                case 'incomes':
+                    updateIncomeDisplay();
+                    break;
+                case 'expenses':
+                    updateExpenseDisplay();
+                    break;
+                case 'transactions':
+                    updateTransactionDisplay();
+                    break;
+                case 'subscriptions':
+                    updateSubscriptionDisplay();
+                    break;
+                case 'goals':
+                    updateGoalsDisplay();
+                    break;
+                case 'database':
+                    updateDatabaseStats();
+                    break;
+                case 'yearwise':
+                    updateYearwiseAnalysis();
+                    break;
+            }
+        }
+
+        // Save data to localStorage
+        function saveData() {
+            localStorage.setItem('financeIncomes', JSON.stringify(financeData.incomes));
+            localStorage.setItem('financeExpenses', JSON.stringify(financeData.expenses));
+            localStorage.setItem('financeSubscriptions', JSON.stringify(financeData.subscriptions));
+            localStorage.setItem('financeGoals', JSON.stringify(financeData.goals));
+            localStorage.setItem('financeAccounts', JSON.stringify(financeData.accounts));
+        }
+
+        // Income functions
+        function addIncome() {
+            const source = document.getElementById('income-source').value;
+            const amount = parseFloat(document.getElementById('income-amount').value);
+            const date = document.getElementById('income-date').value;
+            const accountId = document.getElementById('income-account').value;
+            const description = document.getElementById('income-description').value;
+
+            if (!amount || amount <= 0) {
+                alert('Please enter a valid amount');
+                return;
+            }
+
+            if (!accountId) {
+                alert('Please select a bank account');
+                return;
+            }
+
+            const account = financeData.accounts.find(acc => acc.id == accountId);
+            if (!account) {
+                alert('Selected account not found');
+                return;
+            }
+
+            const income = {
+                id: Date.now(),
+                source,
+                amount,
+                date,
+                accountId: parseInt(accountId),
+                accountName: account.name,
+                description: description || source,
+                timestamp: new Date().toISOString()
+            };
+
+            financeData.incomes.push(income);
+            
+            // Update account balance in real-time
+            account.balance += amount;
+            account.lastUpdated = new Date().toISOString();
+            
+            saveData();
+            updateAllDisplaysRealTime();
+            
+            // Clear form
+            document.getElementById('income-amount').value = '';
+            document.getElementById('income-description').value = '';
+            document.getElementById('income-account').selectedIndex = 0;
+            
+            // Show success message
+            showAlert(`Income added successfully! Account ${account.name} updated.`, 'success');
+        }
+
+        function updateIncomeDisplay() {
+            const container = document.getElementById('income-records');
+            const totalIncome = financeData.incomes.reduce((sum, income) => sum + income.amount, 0);
+            const currentYear = new Date().getFullYear();
+            const yearlyIncome = financeData.incomes
+                .filter(income => new Date(income.date).getFullYear() === currentYear)
+                .reduce((sum, income) => sum + income.amount, 0);
+
+            document.getElementById('total-income').textContent = `₹${yearlyIncome.toLocaleString('en-IN')}`;
+            document.getElementById('avg-monthly-income').textContent = `₹${(yearlyIncome / 12).toLocaleString('en-IN', {maximumFractionDigits: 0})}`;
+
+            if (financeData.incomes.length === 0) {
+                container.innerHTML = `
+                    <div class="empty-state">
+                        <i class="fas fa-arrow-up"></i>
+                        <h3>No income records</h3>
+                        <p>Start by adding your first income entry</p>
+                    </div>
+                `;
+                return;
+            }
+
+            const recentIncomes = financeData.incomes
+                .sort((a, b) => new Date(b.date) - new Date(a.date))
+                .slice(0, 10);
+
+            container.innerHTML = recentIncomes.map(income => `
+                <div class="table-row">
+                    <div>
+                        <strong>${income.source}</strong><br>
+                        <small>${income.description}</small>
+                    </div>
+                    <div class="stat-value" style="font-size: 16px; color: #10b981;">₹${income.amount.toLocaleString('en-IN')}</div>
+                    <div style="color: #667eea;"><i class="fas fa-university"></i> ${income.accountName || 'No Account'}</div>
+                    <div>${new Date(income.date).toLocaleDateString('en-IN')}</div>
+                    <div>
+                        <button class="btn btn-danger" style="padding: 4px 8px; font-size: 12px;" onclick="deleteIncome(${income.id})">
+                            <i class="fas fa-trash"></i>
+                        </button>
+                    </div>
+                </div>
+            `).join('');
+        }
+
+        function deleteIncome(id) {
+            if (confirm('Are you sure you want to delete this income record?')) {
+                const income = financeData.incomes.find(inc => inc.id === id);
+                if (income && income.accountId) {
+                    // Reverse the account balance change
+                    const account = financeData.accounts.find(acc => acc.id === income.accountId);
+                    if (account) {
+                        account.balance -= income.amount;
+                        account.lastUpdated = new Date().toISOString();
+                    }
+                }
+                financeData.incomes = financeData.incomes.filter(income => income.id !== id);
+                saveData();
+                updateAllDisplaysRealTime();
+                showAlert('Income record deleted and account balance updated', 'success');
+            }
+        }
+
+        // Expense functions
+        function addExpense() {
+            const category = document.getElementById('expense-category').value;
+            const amount = parseFloat(document.getElementById('expense-amount').value);
+            const date = document.getElementById('expense-date').value;
+            const accountId = document.getElementById('expense-account').value;
+            const description = document.getElementById('expense-description').value;
+
+            if (!amount || amount <= 0) {
+                alert('Please enter a valid amount');
+                return;
+            }
+
+            if (!accountId) {
+                alert('Please select a bank account');
+                return;
+            }
+
+            const account = financeData.accounts.find(acc => acc.id == accountId);
+            if (!account) {
+                alert('Selected account not found');
+                return;
+            }
+
+            // Check if account has sufficient balance (except for credit cards)
+            if (account.type !== 'credit' && account.balance < amount) {
+                if (!confirm(`Insufficient balance in ${account.name}. Current balance: ₹${account.balance.toLocaleString('en-IN')}. Continue anyway?`)) {
+                    return;
+                }
+            }
+
+            const expense = {
+                id: Date.now(),
+                category,
+                amount,
+                date,
+                accountId: parseInt(accountId),
+                accountName: account.name,
+                description: description || category,
+                timestamp: new Date().toISOString()
+            };
+
+            financeData.expenses.push(expense);
+            
+            // Update account balance in real-time
+            if (account.type === 'credit') {
+                // For credit cards, increase the balance (debt)
+                account.balance += amount;
+            } else {
+                // For regular accounts, decrease the balance
+                account.balance -= amount;
+            }
+            account.lastUpdated = new Date().toISOString();
+            
+            saveData();
+            updateAllDisplaysRealTime();
+            
+            // Clear form
+            document.getElementById('expense-amount').value = '';
+            document.getElementById('expense-description').value = '';
+            document.getElementById('expense-account').selectedIndex = 0;
+            
+            showAlert(`Expense added successfully! Account ${account.name} updated.`, 'success');
+        }
+
+        function updateExpenseDisplay() {
+            const container = document.getElementById('expense-records');
+            const currentYear = new Date().getFullYear();
+            const yearlyExpenses = financeData.expenses
+                .filter(expense => new Date(expense.date).getFullYear() === currentYear && !expense.isTransfer)
+                .reduce((sum, expense) => sum + expense.amount, 0);
+
+            document.getElementById('total-expenses').textContent = `₹${yearlyExpenses.toLocaleString('en-IN')}`;
+            document.getElementById('avg-monthly-expense').textContent = `₹${(yearlyExpenses / 12).toLocaleString('en-IN', {maximumFractionDigits: 0})}`;
+
+            // Filter out transfer records for display in expenses section
+            const recentExpenses = financeData.expenses
+                .filter(expense => !expense.isTransfer)  // Exclude transfer records
+                .sort((a, b) => new Date(b.date) - new Date(a.date))
+                .slice(0, 10);
+
+            if (recentExpenses.length === 0) {
+                container.innerHTML = `
+                    <div class="empty-state">
+                        <i class="fas fa-arrow-down"></i>
+                        <h3>No expense records</h3>
+                        <p>Start by adding your first expense entry</p>
+                    </div>
+                `;
+                return;
+            }
+
+            container.innerHTML = recentExpenses.map(expense => `
+                <div class="table-row">
+                    <div>
+                        <strong>${expense.category}</strong><br>
+                        <small>${expense.description}</small>
+                    </div>
+                    <div class="stat-value" style="font-size: 16px; color: #ef4444;">₹${expense.amount.toLocaleString('en-IN')}</div>
+                    <div style="color: #667eea;"><i class="fas fa-university"></i> ${expense.accountName || 'No Account'}</div>
+                    <div>${new Date(expense.date).toLocaleDateString('en-IN')}</div>
+                    <div>
+                        <button class="btn btn-danger" style="padding: 4px 8px; font-size: 12px;" onclick="deleteExpense(${expense.id})">
+                            <i class="fas fa-trash"></i>
+                        </button>
+                    </div>
+                </div>
+            `).join('');
+        }
+
+        function deleteExpense(id) {
+            if (confirm('Are you sure you want to delete this expense record?')) {
+                const expense = financeData.expenses.find(exp => exp.id === id);
+                if (expense && expense.accountId) {
+                    // Reverse the account balance change
+                    const account = financeData.accounts.find(acc => acc.id === expense.accountId);
+                    if (account) {
+                        if (account.type === 'credit') {
+                            account.balance -= expense.amount;
+                        } else {
+                            account.balance += expense.amount;
+                        }
+                        account.lastUpdated = new Date().toISOString();
+                    }
+                }
+                financeData.expenses = financeData.expenses.filter(expense => expense.id !== id);
+                saveData();
+                updateAllDisplaysRealTime();
+                showAlert('Expense record deleted and account balance updated', 'success');
+            }
+        }
+
+        // Subscription functions
+        function addSubscription() {
+            const name = document.getElementById('subscription-name').value;
+            const cost = parseFloat(document.getElementById('subscription-cost').value);
+            const date = document.getElementById('subscription-date').value;
+            const accountId = document.getElementById('subscription-account').value;
+            const category = document.getElementById('subscription-category').value;
+
+            if (!name || !cost || cost <= 0) {
+                alert('Please enter valid subscription details');
+                return;
+            }
+
+            if (!accountId) {
+                alert('Please select a bank account for this subscription');
+                return;
+            }
+
+            const account = financeData.accounts.find(acc => acc.id == accountId);
+            if (!account) {
+                alert('Selected account not found');
+                return;
+            }
+
+            // Check if account has sufficient balance for first payment (except credit cards)
+            if (account.type !== 'credit' && account.balance < cost) {
+                if (!confirm(`Insufficient balance in ${account.name} for first payment. Current balance: ₹${account.balance.toLocaleString('en-IN')}. Continue anyway?`)) {
+                    return;
+                }
+            }
+
+            const subscription = {
+                id: Date.now(),
+                name,
+                cost,
+                nextPayment: date,
+                accountId: parseInt(accountId),
+                accountName: account.name,
+                category,
+                active: true,
+                created: new Date().toISOString()
+            };
+
+            financeData.subscriptions.push(subscription);
+            
+            // Add expense record for initial subscription payment
+            const expenseRecord = {
+                id: Date.now() + 1,
+                category: 'subscription',
+                amount: cost,
+                date: new Date().toISOString().split('T')[0],
+                accountId: parseInt(accountId),
+                accountName: account.name,
+                description: `${name} subscription payment`,
+                timestamp: new Date().toISOString()
+            };
+            
+            financeData.expenses.push(expenseRecord);
+            
+            // Deduct first payment from account (simulate immediate payment)
+            if (account.type === 'credit') {
+                account.balance += cost;
+            } else {
+                account.balance -= cost;
+            }
+            account.lastUpdated = new Date().toISOString();
+            
+            saveData();
+            updateAllDisplaysRealTime();
+            
+            // Clear form
+            document.getElementById('subscription-name').value = '';
+            document.getElementById('subscription-cost').value = '';
+            document.getElementById('subscription-account').selectedIndex = 0;
+            
+            showAlert(`Subscription added successfully! First payment of ₹${cost.toLocaleString('en-IN')} deducted from ${account.name}.`, 'success');
+        }
+
+        function addModalSubscription() {
+            const name = document.getElementById('modal-subscription-name').value;
+            const cost = parseFloat(document.getElementById('modal-subscription-cost').value);
+            const date = document.getElementById('modal-subscription-date').value;
+            const accountId = document.getElementById('modal-subscription-account').value;
+            const category = document.getElementById('modal-subscription-category').value;
+
+            if (!name || !cost || cost <= 0) {
+                alert('Please enter valid subscription details');
+                return;
+            }
+
+            if (!accountId) {
+                alert('Please select a bank account for this subscription');
+                return;
+            }
+
+            const account = financeData.accounts.find(acc => acc.id == accountId);
+            if (!account) {
+                alert('Selected account not found');
+                return;
+            }
+
+            // Check if account has sufficient balance for first payment (except credit cards)
+            if (account.type !== 'credit' && account.balance < cost) {
+                if (!confirm(`Insufficient balance in ${account.name} for first payment. Current balance: ₹${account.balance.toLocaleString('en-IN')}. Continue anyway?`)) {
+                    return;
+                }
+            }
+
+            const subscription = {
+                id: Date.now(),
+                name,
+                cost,
+                nextPayment: date,
+                accountId: parseInt(accountId),
+                accountName: account.name,
+                category,
+                active: true,
+                created: new Date().toISOString()
+            };
+
+            financeData.subscriptions.push(subscription);
+            
+            // Add expense record for initial subscription payment
+            const expenseRecord = {
+                id: Date.now() + 1,
+                category: 'subscription',
+                amount: cost,
+                date: new Date().toISOString().split('T')[0],
+                accountId: parseInt(accountId),
+                accountName: account.name,
+                description: `${name} subscription payment`,
+                timestamp: new Date().toISOString()
+            };
+            
+            financeData.expenses.push(expenseRecord);
+            
+            // Deduct first payment from account (simulate immediate payment)
+            if (account.type === 'credit') {
+                account.balance += cost;
+            } else {
+                account.balance -= cost;
+            }
+            account.lastUpdated = new Date().toISOString();
+            
+            saveData();
+            updateAllDisplaysRealTime();
+            
+            // Clear modal form and close
+            document.getElementById('modal-subscription-name').value = '';
+            document.getElementById('modal-subscription-cost').value = '';
+            document.getElementById('modal-subscription-account').selectedIndex = 0;
+            closeModal();
+            
+            showAlert(`Subscription added successfully! First payment of ₹${cost.toLocaleString('en-IN')} deducted from ${account.name}.`, 'success');
+        }
+
+        function updateSubscriptionDisplay() {
+            const container = document.getElementById('subscription-records');
+            const totalMonthlyCost = financeData.subscriptions
+                .filter(sub => sub.active)
+                .reduce((sum, sub) => sum + sub.cost, 0);
+
+            document.getElementById('total-subscriptions').textContent = `₹${totalMonthlyCost.toLocaleString('en-IN')}`;
+            document.getElementById('yearly-subscriptions').textContent = `₹${(totalMonthlyCost * 12).toLocaleString('en-IN')}`;
+            document.getElementById('subscription-count').textContent = financeData.subscriptions.filter(sub => sub.active).length;
+
+            if (financeData.subscriptions.filter(sub => sub.active).length === 0) {
+                container.innerHTML = `
+                    <div class="empty-state">
+                        <i class="fas fa-sync-alt"></i>
+                        <h3>No subscriptions tracked</h3>
+                        <p>Add your recurring subscriptions to track monthly costs</p>
+                    </div>
+                `;
+                return;
+            }
+
+            const activeSubscriptions = financeData.subscriptions.filter(sub => sub.active);
+            
+            container.innerHTML = activeSubscriptions.map(subscription => `
+                <div class="table-row">
+                    <div><strong>${subscription.name}</strong></div>
+                    <div class="stat-value" style="font-size: 16px; color: #667eea;">₹${subscription.cost.toLocaleString('en-IN')}</div>
+                    <div style="color: #667eea;"><i class="fas fa-university"></i> ${subscription.accountName || 'No Account'}</div>
+                    <div><span class="badge badge-active">${subscription.category}</span></div>
+                    <div>${new Date(subscription.nextPayment).toLocaleDateString('en-IN')}</div>
+                    <div>
+                        <button class="btn" style="padding: 4px 8px; font-size: 12px; margin-right: 4px;" onclick="processSubscriptionPayment(${subscription.id})" title="Process Payment">
+                            <i class="fas fa-credit-card"></i>
+                        </button>
+                        <button class="btn btn-danger" style="padding: 4px 8px; font-size: 12px;" onclick="deleteSubscription(${subscription.id})">
+                            <i class="fas fa-trash"></i>
+                        </button>
+                    </div>
+                </div>
+            `).join('');
+        }
+
+        function deleteSubscription(id) {
+            const subscription = financeData.subscriptions.find(sub => sub.id === id);
+            if (!subscription) return;
+            
+            let confirmMessage = `Are you sure you want to cancel the subscription for "${subscription.name}"?`;
+            if (subscription.accountId) {
+                confirmMessage += '\n\nNote: This will not refund any payments already made.';
+            }
+            
+            if (confirm(confirmMessage)) {
+                financeData.subscriptions = financeData.subscriptions.filter(sub => sub.id !== id);
+                // Also remove associated expense records for this subscription
+                financeData.expenses = financeData.expenses.filter(expense => 
+                    !(expense.category === 'subscription' && expense.description.includes(subscription.name))
+                );
+                saveData();
+                updateAllDisplaysRealTime();
+                showAlert(`Subscription for "${subscription.name}" cancelled successfully!`, 'success');
+            }
+        }
+        
+        // Process subscription payment manually
+        function processSubscriptionPayment(id) {
+            const subscription = financeData.subscriptions.find(sub => sub.id === id);
+            if (!subscription || !subscription.accountId) {
+                alert('Subscription or account not found');
+                return;
+            }
+            
+            const account = financeData.accounts.find(acc => acc.id === subscription.accountId);
+            if (!account) {
+                alert('Account not found for this subscription');
+                return;
+            }
+            
+            // Check balance for non-credit accounts
+            if (account.type !== 'credit' && account.balance < subscription.cost) {
+                if (!confirm(`Insufficient balance in ${account.name}. Current balance: ₹${account.balance.toLocaleString('en-IN')}. Process payment anyway?`)) {
+                    return;
+                }
+            }
+            
+            // Process payment
+            if (account.type === 'credit') {
+                account.balance += subscription.cost;
+            } else {
+                account.balance -= subscription.cost;
+            }
+            account.lastUpdated = new Date().toISOString();
+            
+            // Update next payment date (add 1 month)
+            const nextDate = new Date(subscription.nextPayment);
+            nextDate.setMonth(nextDate.getMonth() + 1);
+            subscription.nextPayment = nextDate.toISOString().split('T')[0];
+            
+            // Add expense record for this payment
+            const expenseRecord = {
+                id: Date.now(),
+                category: 'subscription',
+                amount: subscription.cost,
+                date: new Date().toISOString().split('T')[0],
+                accountId: subscription.accountId,
+                accountName: subscription.accountName,
+                description: `${subscription.name} subscription payment`,
+                timestamp: new Date().toISOString()
+            };
+            
+            financeData.expenses.push(expenseRecord);
+            
+            saveData();
+            updateAllDisplaysRealTime();
+            
+            showAlert(`Payment of ₹${subscription.cost.toLocaleString('en-IN')} processed for ${subscription.name}. Next payment: ${nextDate.toLocaleDateString('en-IN')}`, 'success');
+        }
+
+        // Goals functions
+        function addGoal() {
+            const name = document.getElementById('goal-name').value;
+            const target = parseFloat(document.getElementById('goal-target').value);
+            const current = parseFloat(document.getElementById('goal-current').value) || 0;
+            const date = document.getElementById('goal-date').value;
+
+            if (!name || !target || target <= 0) {
+                alert('Please enter valid goal details');
+                return;
+            }
+
+            const goal = {
+                id: Date.now(),
+                name,
+                target,
+                current,
+                targetDate: date,
+                created: new Date().toISOString()
+            };
+
+            financeData.goals.push(goal);
+            saveData();
+            updateGoalsDisplay();
+            
+            // Clear form
+            document.getElementById('goal-name').value = '';
+            document.getElementById('goal-target').value = '';
+            document.getElementById('goal-current').value = '0';
+            document.getElementById('goal-date').value = '';
+            
+            showAlert('Goal created successfully!', 'success');
+        }
+
+        function updateGoalsDisplay() {
+            const container = document.getElementById('goal-records');
+            const totalTarget = financeData.goals.reduce((sum, goal) => sum + goal.target, 0);
+            const totalSaved = financeData.goals.reduce((sum, goal) => sum + goal.current, 0);
+
+            document.getElementById('total-goal-target').textContent = `₹${totalTarget.toLocaleString('en-IN')}`;
+            document.getElementById('total-goal-saved').textContent = `₹${totalSaved.toLocaleString('en-IN')}`;
+
+            if (financeData.goals.length === 0) {
+                container.innerHTML = `
+                    <div class="empty-state">
+                        <i class="fas fa-bullseye"></i>
+                        <h3>No financial goals set</h3>
+                        <p>Create your first savings goal to start tracking progress</p>
+                    </div>
+                `;
+                return;
+            }
+
+            container.innerHTML = financeData.goals.map(goal => {
+                const progress = (goal.current / goal.target) * 100;
+                const progressColor = progress >= 100 ? '#10b981' : progress >= 75 ? '#f59e0b' : '#6366f1';
+                
+                return `
+                    <div class="table-row">
+                        <div><strong>${goal.name}</strong></div>
+                        <div>
+                            <div style="display: flex; align-items: center; gap: 8px;">
+                                <div style="flex: 1; background: #e5e7eb; height: 8px; border-radius: 4px;">
+                                    <div style="width: ${Math.min(progress, 100)}%; height: 100%; background: ${progressColor}; border-radius: 4px;"></div>
+                                </div>
+                                <span style="font-size: 12px; font-weight: 600;">${progress.toFixed(1)}%</span>
+                            </div>
+                            <small>₹${goal.current.toLocaleString('en-IN')} / ₹${goal.target.toLocaleString('en-IN')}</small>
+                        </div>
+                        <div class="stat-value" style="font-size: 16px;">₹${goal.target.toLocaleString('en-IN')}</div>
+                        <div>${goal.targetDate ? new Date(goal.targetDate).toLocaleDateString('en-IN') : 'No date set'}</div>
+                        <div>
+                            <button class="btn" style="padding: 4px 8px; font-size: 12px; margin-right: 4px;" onclick="updateGoalProgress(${goal.id})">
+                                <i class="fas fa-edit"></i>
+                            </button>
+                            <button class="btn btn-danger" style="padding: 4px 8px; font-size: 12px;" onclick="deleteGoal(${goal.id})">
+                                <i class="fas fa-trash"></i>
+                            </button>
+                        </div>
+                    </div>
+                `;
+            }).join('');
+        }
+
+        function updateGoalProgress(id) {
+            const goal = financeData.goals.find(g => g.id === id);
+            if (!goal) return;
+            
+            const newAmount = prompt(`Update progress for "${goal.name}":
+Current: ₹${goal.current.toLocaleString('en-IN')}
+Target: ₹${goal.target.toLocaleString('en-IN')}
+
+Enter new current amount:`);
+            
+            if (newAmount !== null) {
+                const amount = parseFloat(newAmount);
+                if (!isNaN(amount) && amount >= 0) {
+                    goal.current = amount;
+                    saveData();
+                    updateGoalsDisplay();
+                    showAlert('Goal progress updated!', 'success');
+                }
+            }
+        }
+
+        function deleteGoal(id) {
+            if (confirm('Are you sure you want to delete this goal?')) {
+                financeData.goals = financeData.goals.filter(goal => goal.id !== id);
+                saveData();
+                updateGoalsDisplay();
+                showAlert('Goal deleted', 'success');
+            }
+        }
+
+        function addModalGoal() {
+            const name = document.getElementById('modal-goal-name').value;
+            const target = parseFloat(document.getElementById('modal-goal-target').value);
+            const current = parseFloat(document.getElementById('modal-goal-current').value) || 0;
+            const date = document.getElementById('modal-goal-date').value;
+
+            if (!name || !target || target <= 0) {
+                alert('Please enter valid goal details');
+                return;
+            }
+
+            const goal = {
+                id: Date.now(),
+                name,
+                target,
+                current,
+                targetDate: date,
+                created: new Date().toISOString()
+            };
+
+            financeData.goals.push(goal);
+            saveData();
+            updateGoalsDisplay();
+            
+            // Clear modal form and close
+            document.getElementById('modal-goal-name').value = '';
+            document.getElementById('modal-goal-target').value = '';
+            document.getElementById('modal-goal-current').value = '0';
+            document.getElementById('modal-goal-date').value = '';
+            closeModal();
+            
+            showAlert('Goal created successfully!', 'success');
+        }
+
+        // Transaction functions
+        function updateTransactionDisplay() {
+            const container = document.getElementById('transaction-records');
+            
+            // Combine incomes and expenses into transactions
+            // Include transfer records in transactions view
+            const transactions = [
+                ...financeData.incomes.map(income => ({
+                    ...income,
+                    type: 'income',
+                    category: income.source
+                })),
+                ...financeData.expenses.map(expense => ({
+                    ...expense,
+                    type: expense.isTransfer ? 'transfer' : 'expense'
+                }))
+            ].sort((a, b) => new Date(b.date) - new Date(a.date));
+
+            if (transactions.length === 0) {
+                container.innerHTML = `
+                    <div class="empty-state">
+                        <i class="fas fa-exchange-alt"></i>
+                        <h3>No transactions yet</h3>
+                        <p>Your income and expense records will appear here</p>
+                    </div>
+                `;
+                return;
+            }
+
+            container.innerHTML = transactions.slice(0, 50).map(transaction => `
+                <div class="table-row">
+                    <div><strong>${transaction.description}</strong></div>
+                    <div><span class="badge badge-${transaction.type}">${transaction.category}</span></div>
+                    <div class="stat-value" style="font-size: 16px; color: ${transaction.type === 'income' ? '#10b981' : transaction.type === 'transfer' ? '#6366f1' : '#ef4444'};">
+                        ${transaction.type === 'income' ? '+' : transaction.type === 'transfer' ? '⇄' : '-'}₹${transaction.amount.toLocaleString('en-IN')}
+                    </div>
+                    <div style="color: #667eea;"><i class="fas fa-university"></i> ${transaction.accountName || 'No Account'}</div>
+                    <div>${new Date(transaction.date).toLocaleDateString('en-IN')}</div>
+                    <div><span class="badge badge-${transaction.type}">${transaction.type}</span></div>
+                </div>
+            `).join('');
+        }
+
+        function populateFilterDropdowns() {
+            const categoryFilter = document.getElementById('category-filter');
+            if (!categoryFilter) return;
+
+            const categories = new Set();
+            financeData.incomes.forEach(income => categories.add(income.source));
+            financeData.expenses.forEach(expense => categories.add(expense.category));
+            // Add transfer category if there are transfer records
+            if (financeData.expenses.some(expense => expense.isTransfer)) {
+                categories.add('transfer');
+            }
+
+            categoryFilter.innerHTML = '<option value="all">All Categories</option>' +
+                Array.from(categories).sort().map(cat => 
+                    `<option value="${cat}">${cat}</option>`
+                ).join('');
+        }
+
+        function filterTransactions() {
+            const typeFilter = document.getElementById('transaction-filter').value;
+            const categoryFilter = document.getElementById('category-filter').value;
+            
+            let transactions = [
+                ...financeData.incomes.map(income => ({
+                    ...income,
+                    type: 'income',
+                    category: income.source
+                })),
+                ...financeData.expenses.map(expense => ({
+                    ...expense,
+                    type: expense.isTransfer ? 'transfer' : 'expense'
+                }))
+            ];
+
+            if (typeFilter !== 'all') {
+                transactions = transactions.filter(t => t.type === typeFilter);
+            }
+
+            if (categoryFilter !== 'all') {
+                transactions = transactions.filter(t => t.category === categoryFilter);
+            }
+
+            transactions.sort((a, b) => new Date(b.date) - new Date(a.date));
+
+            const container = document.getElementById('transaction-records');
+            container.innerHTML = transactions.slice(0, 50).map(transaction => `
+                <div class="table-row">
+                    <div><strong>${transaction.description}</strong></div>
+                    <div><span class="badge badge-${transaction.type}">${transaction.category}</span></div>
+                    <div class="stat-value" style="font-size: 16px; color: ${transaction.type === 'income' ? '#10b981' : transaction.type === 'transfer' ? '#6366f1' : '#ef4444'};">
+                        ${transaction.type === 'income' ? '+' : transaction.type === 'transfer' ? '⇄' : '-'}₹${transaction.amount.toLocaleString('en-IN')}
+                    </div>
+                    <div style="color: #667eea;"><i class="fas fa-university"></i> ${transaction.accountName || 'No Account'}</div>
+                    <div>${new Date(transaction.date).toLocaleDateString('en-IN')}</div>
+                    <div><span class="badge badge-${transaction.type}">${transaction.type}</span></div>
+                </div>
+            `).join('');
+        }
+
+        // Dashboard functions
+        function updateDashboard() {
+            const currentMonth = new Date().getMonth();
+            const currentYear = new Date().getFullYear();
+            
+            // Calculate total balance from all bank accounts
+            const totalBalance = financeData.accounts.reduce((sum, account) => {
+                if (account.type === 'credit' || account.type === 'loan') {
+                    // For credit cards and loans, negative balance means debt
+                    return sum - Math.abs(account.balance);
+                }
+                return sum + account.balance;
+            }, 0);
+            
+            // Calculate monthly income
+            const monthlyIncome = financeData.incomes
+                .filter(income => {
+                    const date = new Date(income.date);
+                    return date.getMonth() === currentMonth && date.getFullYear() === currentYear;
+                })
+                .reduce((sum, income) => sum + income.amount, 0);
+
+            // Calculate monthly expenses, excluding transfers
+            // Subscription expenses are already included as expense records, so we just need to exclude transfers
+            // This ensures no double counting of subscription costs
+            const monthlyExpenses = financeData.expenses
+                .filter(expense => {
+                    const date = new Date(expense.date);
+                    return date.getMonth() === currentMonth && date.getFullYear() === currentYear && !expense.isTransfer;
+                })
+                .reduce((sum, expense) => sum + expense.amount, 0);
+
+            const savingsRate = monthlyIncome > 0 ? ((monthlyIncome - monthlyExpenses) / monthlyIncome * 100) : 0;
+
+            // Update dashboard cards with real bank account total
+            document.getElementById('total-balance').textContent = `₹${totalBalance.toLocaleString('en-IN')}`;
+            document.getElementById('monthly-income').textContent = `₹${monthlyIncome.toLocaleString('en-IN')}`;
+            document.getElementById('monthly-expenses').textContent = `₹${monthlyExpenses.toLocaleString('en-IN')}`;
+            document.getElementById('savings-rate').textContent = `${savingsRate.toFixed(1)}%`;
+
+            // Calculate net worth from account balances (same as total balance)
+            const netWorth = totalBalance;
+            const emergencyFundTarget = monthlyExpenses * 6;
+            
+            document.getElementById('net-worth').textContent = `₹${netWorth.toLocaleString('en-IN')}`;
+            document.getElementById('emergency-fund').textContent = `₹${emergencyFundTarget.toLocaleString('en-IN')}`;
+            
+            // Update account breakdown
+            updateAccountBreakdown();
+        }
+
+        // Chart functions
+        function createOverviewCharts() {
+            createIncomeExpenseChart();
+            createCategoryChart();
+        }
+
+        function createIncomeExpenseChart() {
+            const ctx = document.getElementById('overview-chart');
+            if (!ctx) return;
+
+            const chart = Chart.getChart(ctx);
+            if (chart) chart.destroy();
+
+            // Get last 6 months data
+            const months = [];
+            const incomeData = [];
+            const expenseData = [];
+
+            for (let i = 5; i >= 0; i--) {
+                const date = new Date();
+                date.setMonth(date.getMonth() - i);
+                const month = date.getMonth();
+                const year = date.getFullYear();
+                
+                months.push(date.toLocaleDateString('en-US', { month: 'short' }));
+                
+                const monthlyIncome = financeData.incomes
+                    .filter(income => {
+                        const incomeDate = new Date(income.date);
+                        return incomeDate.getMonth() === month && incomeDate.getFullYear() === year;
+                    })
+                    .reduce((sum, income) => sum + income.amount, 0);
+
+                const monthlyExpenses = financeData.expenses
+                    .filter(expense => {
+                        const expenseDate = new Date(expense.date);
+                        return expenseDate.getMonth() === month && expenseDate.getFullYear() === year && !expense.isTransfer;
+                    })
+                    .reduce((sum, expense) => sum + expense.amount, 0);
+
+                incomeData.push(monthlyIncome);
+                expenseData.push(monthlyExpenses);
+            }
+
+            new Chart(ctx, {
+                type: 'line',
+                data: {
+                    labels: months,
+                    datasets: [
+                        {
+                            label: 'Income',
+                            data: incomeData,
+                            borderColor: '#10b981',
+                            backgroundColor: 'rgba(16, 185, 129, 0.1)',
+                            tension: 0.4
+                        },
+                        {
+                            label: 'Expenses',
+                            data: expenseData,
+                            borderColor: '#ef4444',
+                            backgroundColor: 'rgba(239, 68, 68, 0.1)',
+                            tension: 0.4
+                        }
+                    ]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    plugins: {
+                        legend: {
+                            position: 'top'
+                        }
+                    },
+                    scales: {
+                        y: {
+                            beginAtZero: true,
+                            ticks: {
+                                callback: function(value) {
+                                    return '₹' + value.toLocaleString('en-IN');
+                                }
+                            }
+                        }
+                    }
+                }
+            });
+        }
+
+        function createCategoryChart() {
+            const ctx = document.getElementById('category-chart');
+            if (!ctx) return;
+
+            const chart = Chart.getChart(ctx);
+            if (chart) chart.destroy();
+
+            // Calculate category totals, excluding transfers
+            const categoryTotals = {};
+            financeData.expenses
+                .filter(expense => !expense.isTransfer)  // Exclude transfer records
+                .forEach(expense => {
+                    categoryTotals[expense.category] = (categoryTotals[expense.category] || 0) + expense.amount;
+                });
+
+            const categories = Object.keys(categoryTotals);
+            const amounts = Object.values(categoryTotals);
+            const colors = [
+                '#ff6384', '#36a2eb', '#ffce56', '#4bc0c0', '#9966ff',
+                '#ff9f40', '#ff6384', '#c9cbcf', '#4bc0c0', '#36a2eb'
+            ];
+
+            new Chart(ctx, {
+                type: 'doughnut',
+                data: {
+                    labels: categories,
+                    datasets: [{
+                        data: amounts,
+                        backgroundColor: colors.slice(0, categories.length),
+                        borderWidth: 2,
+                        borderColor: '#fff'
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    plugins: {
+                        legend: {
+                            position: 'bottom'
+                        }
+                    }
+                }
+            });
+        }
+
+        // Database functions
+        function updateDatabaseStats() {
+            document.getElementById('db-income-count').textContent = financeData.incomes.length;
+            document.getElementById('db-expense-count').textContent = financeData.expenses.length;
+            document.getElementById('db-subscription-count').textContent = financeData.subscriptions.filter(sub => sub.active).length;
+            document.getElementById('db-goal-count').textContent = financeData.goals.length;
+        }
+
+        function exportAllData() {
+            const exportData = {
+                ...financeData,
+                exportDate: new Date().toISOString(),
+                version: '1.0'
+            };
+
+            const dataStr = JSON.stringify(exportData, null, 2);
+            const dataBlob = new Blob([dataStr], { type: 'application/json' });
+            const url = URL.createObjectURL(dataBlob);
+            const link = document.createElement('a');
+            link.href = url;
+            link.download = `finance-tracker-${new Date().toISOString().split('T')[0]}.json`;
+            document.body.appendChild(link);
+            link.click();
+            document.body.removeChild(link);
+            URL.revokeObjectURL(url);
+            
+            showAlert('Data exported successfully!', 'success');
+        }
+
+        function exportCSV() {
+            // Create combined transaction CSV
+            const transactions = [
+                ...financeData.incomes.map(income => ({
+                    Date: income.date,
+                    Type: 'Income',
+                    Category: income.source,
+                    Description: income.description,
+                    Amount: income.amount
+                })),
+                ...financeData.expenses.map(expense => ({
+                    Date: expense.date,
+                    Type: expense.isTransfer ? 'Transfer' : 'Expense',
+                    Category: expense.category,
+                    Description: expense.description,
+                    Amount: expense.isTransfer ? 0 : -expense.amount  // Transfers don't affect net worth
+                }))
+            ].sort((a, b) => new Date(b.Date) - new Date(a.Date));
+
+            const headers = ['Date', 'Type', 'Category', 'Description', 'Amount'];
+            const csvContent = [
+                headers.join(','),
+                ...transactions.map(row => 
+                    headers.map(header => `"${row[header] || ''}"`).join(',')
+                )
+            ].join('\n');
+
+            const dataBlob = new Blob([csvContent], { type: 'text/csv' });
+            const url = URL.createObjectURL(dataBlob);
+            const link = document.createElement('a');
+            link.href = url;
+            link.download = `finance-tracker-transactions-${new Date().toISOString().split('T')[0]}.csv`;
+            document.body.appendChild(link);
+            link.click();
+            document.body.removeChild(link);
+            URL.revokeObjectURL(url);
+            
+            showAlert('CSV exported successfully!', 'success');
+        }
+
+        function importData() {
+            const fileInput = document.getElementById('import-file');
+            const file = fileInput.files[0];
+            
+            if (!file) {
+                alert('Please select a file to import');
+                return;
+            }
+
+            const reader = new FileReader();
+            reader.onload = function(e) {
+                try {
+                    const importedData = JSON.parse(e.target.result);
+                    
+                    if (confirm('This will replace all existing data. Are you sure you want to continue?')) {
+                        financeData = {
+                            incomes: importedData.incomes || [],
+                            expenses: importedData.expenses || [],
+                            subscriptions: importedData.subscriptions || [],
+                            goals: importedData.goals || [],
+                            accounts: importedData.accounts || []
+                        };
+                        
+                        saveData();
+                        updateAllDisplays();
+                        showAlert('Data imported successfully!', 'success');
+                    }
+                } catch (error) {
+                    alert('Invalid file format. Please select a valid JSON export file.');
+                }
+            };
+            
+            reader.readAsText(file);
+        }
+
+        // Clear data functions
+        function clearAllData() {
+            if (confirm('Are you sure you want to clear ALL data? This action cannot be undone.')) {
+                financeData = {
+                    incomes: [],
+                    expenses: [],
+                    subscriptions: [],
+                    goals: [],
+                    accounts: []
+                };
+                saveData();
+                updateAllDisplays();
+                showAlert('All data cleared successfully!', 'success');
+            }
+        }
+
+        function clearIncomeData() {
+            if (confirm('Are you sure you want to clear all income data?')) {
+                financeData.incomes = [];
+                saveData();
+                updateAllDisplays();
+                showAlert('Income data cleared!', 'success');
+            }
+        }
+
+        function clearExpenseData() {
+            if (confirm('Are you sure you want to clear all expense data?')) {
+                financeData.expenses = [];
+                saveData();
+                updateAllDisplays();
+                showAlert('Expense data cleared!', 'success');
+            }
+        }
+
+        // Modal functions
+        function openModal(modalId) {
+            const modal = document.getElementById(modalId);
+            if (modal) {
+                modal.classList.add('active');
+                // Set current date in modal forms
+                const today = new Date().toISOString().split('T')[0];
+                if (modalId === 'add-income') {
+                    document.getElementById('modal-income-date').value = today;
+                } else if (modalId === 'add-expense') {
+                    document.getElementById('modal-expense-date').value = today;
+                } else if (modalId === 'add-subscription') {
+                    document.getElementById('modal-subscription-date').value = today;
+                } else if (modalId === 'add-goal') {
+                    document.getElementById('modal-goal-date').value = '';
+                }
+            }
+        }
+
+        function closeModal() {
+            document.querySelectorAll('.modal').forEach(modal => {
+                modal.classList.remove('active');
+            });
+        }
+
+        // Modal-specific functions
+        function addModalIncome() {
+            const source = document.getElementById('modal-income-source').value;
+            const amount = parseFloat(document.getElementById('modal-income-amount').value);
+            const date = document.getElementById('modal-income-date').value;
+            const accountId = document.getElementById('modal-income-account').value;
+            const description = document.getElementById('modal-income-description').value;
+
+            if (!amount || amount <= 0) {
+                alert('Please enter a valid amount');
+                return;
+            }
+
+            if (!accountId) {
+                alert('Please select a bank account');
+                return;
+            }
+
+            const account = financeData.accounts.find(acc => acc.id == accountId);
+            if (!account) {
+                alert('Selected account not found');
+                return;
+            }
+
+            const income = {
+                id: Date.now(),
+                source,
+                amount,
+                date,
+                accountId: parseInt(accountId),
+                accountName: account.name,
+                description: description || source,
+                timestamp: new Date().toISOString()
+            };
+
+            financeData.incomes.push(income);
+            
+            // Update account balance in real-time
+            account.balance += amount;
+            account.lastUpdated = new Date().toISOString();
+            
+            saveData();
+            updateAllDisplaysRealTime();
+            
+            // Clear modal form
+            document.getElementById('modal-income-amount').value = '';
+            document.getElementById('modal-income-description').value = '';
+            document.getElementById('modal-income-account').selectedIndex = 0;
+            
+            // Close modal
+            closeModal();
+            
+            // Show success message
+            showAlert(`Income added successfully! Account ${account.name} updated.`, 'success');
+        }
+
+        function addModalExpense() {
+            const category = document.getElementById('modal-expense-category').value;
+            const amount = parseFloat(document.getElementById('modal-expense-amount').value);
+            const date = document.getElementById('modal-expense-date').value;
+            const accountId = document.getElementById('modal-expense-account').value;
+            const description = document.getElementById('modal-expense-description').value;
+
+            if (!amount || amount <= 0) {
+                alert('Please enter a valid amount');
+                return;
+            }
+
+            if (!accountId) {
+                alert('Please select a bank account');
+                return;
+            }
+
+            const account = financeData.accounts.find(acc => acc.id == accountId);
+            if (!account) {
+                alert('Selected account not found');
+                return;
+            }
+
+            // Check if account has sufficient balance (except for credit cards)
+            if (account.type !== 'credit' && account.balance < amount) {
+                if (!confirm(`Insufficient balance in ${account.name}. Current balance: ₹${account.balance.toLocaleString('en-IN')}. Continue anyway?`)) {
+                    return;
+                }
+            }
+
+            const expense = {
+                id: Date.now(),
+                category,
+                amount,
+                date,
+                accountId: parseInt(accountId),
+                accountName: account.name,
+                description: description || category,
+                timestamp: new Date().toISOString()
+            };
+
+            financeData.expenses.push(expense);
+            
+            // Update account balance in real-time
+            if (account.type === 'credit') {
+                account.balance += amount;
+            } else {
+                account.balance -= amount;
+            }
+            account.lastUpdated = new Date().toISOString();
+            
+            saveData();
+            updateAllDisplaysRealTime();
+            
+            // Clear modal form
+            document.getElementById('modal-expense-amount').value = '';
+            document.getElementById('modal-expense-description').value = '';
+            document.getElementById('modal-expense-account').selectedIndex = 0;
+            
+            // Close modal
+            closeModal();
+            
+            // Show success message
+            showAlert(`Expense added successfully! Account ${account.name} updated.`, 'success');
+        }
+
+        // Account functions
+        function addAccount() {
+            const type = document.getElementById('account-type').value;
+            const name = document.getElementById('account-name').value;
+            const balance = parseFloat(document.getElementById('account-balance').value);
+            const institution = document.getElementById('account-institution').value;
+
+            if (!name || !institution) {
+                alert('Please enter account name and institution');
+                return;
+            }
+
+            if (isNaN(balance)) {
+                alert('Please enter a valid balance amount');
+                return;
+            }
+
+            const account = {
+                id: Date.now(),
+                type,
+                name,
+                balance,
+                institution,
+                created: new Date().toISOString(),
+                lastUpdated: new Date().toISOString()
+            };
+
+            financeData.accounts.push(account);
+            saveData();
+            updateAccountDisplay();
+            updateDashboard();
+            
+            // Clear form
+            document.getElementById('account-name').value = '';
+            document.getElementById('account-balance').value = '';
+            document.getElementById('account-institution').value = '';
+            
+            // Close modal
+            closeModal();
+            
+            // Show success message
+            showAlert('Account added successfully!', 'success');
+        }
+
+        function updateAccountDisplay() {
+            const container = document.getElementById('accounts-list');
+            
+            if (financeData.accounts.length === 0) {
+                container.innerHTML = `
+                    <div class="empty-state">
+                        <i class="fas fa-university"></i>
+                        <h3>No accounts added yet</h3>
+                        <p>Add your bank accounts, credit cards, and investments</p>
+                    </div>
+                `;
+                return;
+            }
+
+            container.innerHTML = financeData.accounts.map(account => {
+                const balanceColor = account.type === 'credit' || account.type === 'loan' ? '#ef4444' : '#10b981';
+                const typeIcon = getAccountIcon(account.type);
+                
+                return `
+                    <div class="card" style="margin-bottom: 16px;">
+                        <div class="card-header">
+                            <div>
+                                <div style="display: flex; align-items: center; gap: 8px;">
+                                    <i class="fas ${typeIcon}" style="color: #667eea;"></i>
+                                    <div>
+                                        <div class="card-title">${account.name}</div>
+                                        <small style="color: #718096;">${account.institution}</small>
+                                    </div>
+                                </div>
+                            </div>
+                            <div style="text-align: right;">
+                                <div class="stat-value" style="font-size: 18px; color: ${balanceColor};">
+                                    ₹${account.balance.toLocaleString('en-IN')}
+                                </div>
+                                <small style="color: #718096;">${account.type.charAt(0).toUpperCase() + account.type.slice(1)} Account</small>
+                            </div>
+                        </div>
+                        <div style="display: flex; gap: 8px; margin-top: 12px;">
+                            <button class="btn" style="padding: 6px 12px; font-size: 12px;" onclick="updateAccountBalance(${account.id})">
+                                <i class="fas fa-edit"></i> Update Balance
+                            </button>
+                            <button class="btn btn-danger" style="padding: 6px 12px; font-size: 12px;" onclick="deleteAccount(${account.id})">
+                                <i class="fas fa-trash"></i> Delete
+                            </button>
+                        </div>
+                        <div style="margin-top: 8px;">
+                            <small style="color: #718096;">Last updated: ${account.lastUpdated ? new Date(account.lastUpdated).toLocaleString('en-IN') : 'Never'}</small>
+                        </div>
+                    </div>
+                `;
+            }).join('');
+        }
+
+        function getAccountIcon(type) {
+            switch(type) {
+                case 'savings': return 'fa-piggy-bank';
+                case 'checking': return 'fa-university';
+                case 'credit': return 'fa-credit-card';
+                case 'investment': return 'fa-chart-line';
+                case 'loan': return 'fa-hand-holding-usd';
+                default: return 'fa-wallet';
+            }
+        }
+
+        function updateAccountBalance(id) {
+            const account = financeData.accounts.find(a => a.id === id);
+            if (!account) return;
+            
+            const newBalance = prompt(`Update balance for "${account.name}":\nCurrent: ₹${account.balance.toLocaleString('en-IN')}\n\nEnter new balance:`);
+            
+            if (newBalance !== null) {
+                const balance = parseFloat(newBalance);
+                if (!isNaN(balance)) {
+                    account.balance = balance;
+                    account.lastUpdated = new Date().toISOString();
+                    saveData();
+                    updateAllDisplaysRealTime();
+                    showAlert('Account balance updated in real-time!', 'success');
+                }
+            }
+        }
+
+        function deleteAccount(id) {
+            const account = financeData.accounts.find(acc => acc.id === id);
+            if (!account) return;
+            
+            // Check if account is used in any transactions
+            const hasIncomes = financeData.incomes.some(income => income.accountId === id);
+            const hasExpenses = financeData.expenses.some(expense => expense.accountId === id);
+            
+            let confirmMessage = 'Are you sure you want to delete this account?';
+            if (hasIncomes || hasExpenses) {
+                confirmMessage += '\n\nWarning: This account is linked to existing transactions. Deleting it will not affect the transactions but they will show "No Account".';
+            }
+            
+            if (confirm(confirmMessage)) {
+                financeData.accounts = financeData.accounts.filter(account => account.id !== id);
+                saveData();
+                updateAllDisplaysRealTime();
+                showAlert('Account deleted successfully', 'success');
+            }
+        }
+
+        // Utility functions
+        function showAlert(message, type) {
+            // Create and show a temporary alert
+            const alert = document.createElement('div');
+            alert.className = `alert alert-${type}`;
+            alert.textContent = message;
+            alert.style.position = 'fixed';
+            alert.style.top = '20px';
+            alert.style.right = '20px';
+            alert.style.zIndex = '9999';
+            alert.style.minWidth = '300px';
+            
+            document.body.appendChild(alert);
+            
+            setTimeout(() => {
+                alert.remove();
+            }, 3000);
+        }
+
+        function updateAllDisplays() {
+            updateIncomeDisplay();
+            updateExpenseDisplay();
+            updateTransactionDisplay();
+            updateSubscriptionDisplay();
+            updateGoalsDisplay();
+            updateAccountDisplay();
+            updateDashboard();
+            updateDatabaseStats();
+            updateYearwiseAnalysis();
+            populateFilterDropdowns();
+            populateAccountDropdowns();
+            createOverviewCharts();
+        }
+
+        // Real-time update function
+        function updateAllDisplaysRealTime() {
+            updateAllDisplays();
+            // Trigger real-time balance updates
+            updateNetWorthRealTime();
+        }
+
+        // Start real-time updates
+        function startRealTimeUpdates() {
+            // Update displays every 30 seconds
+            setInterval(() => {
+                updateDashboard();
+                updateAccountDisplay();
+                updateNetWorthRealTime();
+            }, 30000);
+        }
+
+        // Populate account dropdowns
+        function populateAccountDropdowns() {
+            const dropdowns = [
+                'income-account',
+                'expense-account', 
+                'modal-income-account',
+                'modal-expense-account',
+                'subscription-account',
+                'modal-subscription-account',
+                'transfer-from-account'
+            ];
+            
+            dropdowns.forEach(dropdownId => {
+                const dropdown = document.getElementById(dropdownId);
+                if (!dropdown) return;
+                
+                const currentValue = dropdown.value;
+                dropdown.innerHTML = '<option value="">Select Bank Account</option>';
+                
+                financeData.accounts.forEach(account => {
+                    const option = document.createElement('option');
+                    option.value = account.id;
+                    option.textContent = `${account.name} (₹${account.balance.toLocaleString('en-IN')})`;
+                    dropdown.appendChild(option);
+                });
+                
+                // Restore previous selection if valid
+                if (currentValue && financeData.accounts.find(acc => acc.id == currentValue)) {
+                    dropdown.value = currentValue;
+                }
+            });
+        }
+
+        // Real-time balance updates
+        function updateNetWorthRealTime() {
+            const totalAccountBalance = financeData.accounts.reduce((sum, account) => {
+                if (account.type === 'credit' || account.type === 'loan') {
+                    return sum - Math.abs(account.balance); // Subtract debt
+                }
+                return sum + account.balance;
+            }, 0);
+            
+            // Update both total balance and net worth (they're the same now)
+            document.getElementById('total-balance').textContent = `₹${totalAccountBalance.toLocaleString('en-IN')}`;
+            document.getElementById('net-worth').textContent = `₹${totalAccountBalance.toLocaleString('en-IN')}`;
+            
+            // Update account breakdown in real-time
+            updateAccountBreakdown();
+        }
+        
+        // Update account breakdown display
+        function updateAccountBreakdown() {
+            const container = document.getElementById('account-breakdown-content');
+            
+            if (financeData.accounts.length === 0) {
+                container.innerHTML = `
+                    <div class="empty-state">
+                        <i class="fas fa-university"></i>
+                        <h3>No accounts added</h3>
+                        <p>Add bank accounts to see balance breakdown</p>
+                    </div>
+                `;
+                return;
+            }
+            
+            let totalPositive = 0;
+            let totalNegative = 0;
+            
+            const accountHTML = financeData.accounts.map(account => {
+                const isDebt = account.type === 'credit' || account.type === 'loan';
+                const displayBalance = isDebt ? -Math.abs(account.balance) : account.balance;
+                const color = displayBalance >= 0 ? '#10b981' : '#ef4444';
+                const icon = getAccountIcon(account.type);
+                
+                if (displayBalance >= 0) {
+                    totalPositive += displayBalance;
+                } else {
+                    totalNegative += Math.abs(displayBalance);
+                }
+                
+                return `
+                    <div style="display: flex; justify-content: space-between; align-items: center; padding: 12px 0; border-bottom: 1px solid #f3f4f6;">
+                        <div style="display: flex; align-items: center; gap: 12px;">
+                            <i class="fas ${icon}" style="color: #667eea; width: 20px;"></i>
+                            <div>
+                                <div style="font-weight: 600; color: #374151;">${account.name}</div>
+                                <small style="color: #6b7280;">${account.institution} • ${account.type.charAt(0).toUpperCase() + account.type.slice(1)}</small>
+                            </div>
+                        </div>
+                        <div style="text-align: right;">
+                            <div style="font-weight: 700; color: ${color}; font-size: 16px;">
+                                ${displayBalance >= 0 ? '+' : ''}₹${displayBalance.toLocaleString('en-IN')}
+                            </div>
+                            <small style="color: #6b7280;">Updated: ${account.lastUpdated ? new Date(account.lastUpdated).toLocaleDateString('en-IN') : 'Never'}</small>
+                        </div>
+                    </div>
+                `;
+            }).join('');
+            
+            const totalBalance = totalPositive - totalNegative;
+            const summaryHTML = `
+                <div style="margin-top: 16px; padding: 16px; background: #f8fafc; border-radius: 12px;">
+                    <div style="display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 16px; text-align: center;">
+                        <div>
+                            <div style="font-size: 18px; font-weight: 700; color: #10b981;">₹${totalPositive.toLocaleString('en-IN')}</div>
+                            <div style="font-size: 12px; color: #6b7280;">Total Assets</div>
+                        </div>
+                        <div>
+                            <div style="font-size: 18px; font-weight: 700; color: #ef4444;">₹${totalNegative.toLocaleString('en-IN')}</div>
+                            <div style="font-size: 12px; color: #6b7280;">Total Debt</div>
+                        </div>
+                        <div>
+                            <div style="font-size: 18px; font-weight: 700; color: ${totalBalance >= 0 ? '#10b981' : '#ef4444'};">₹${totalBalance.toLocaleString('en-IN')}</div>
+                            <div style="font-size: 12px; color: #6b7280;">Net Balance</div>
+                        </div>
+                    </div>
+                </div>
+            `;
+            
+            container.innerHTML = accountHTML + summaryHTML;
+        }
+        
+        // Transfer Money Functions
+        function updateToAccountOptions() {
+            const fromAccountId = document.getElementById('transfer-from-account').value;
+            const toAccountDropdown = document.getElementById('transfer-to-account');
+            
+            toAccountDropdown.innerHTML = '<option value="">Select Destination Account</option>';
+            
+            if (fromAccountId) {
+                financeData.accounts
+                    .filter(account => account.id != fromAccountId) // Exclude the selected source account
+                    .forEach(account => {
+                        const option = document.createElement('option');
+                        option.value = account.id;
+                        option.textContent = `${account.name} (₹${account.balance.toLocaleString('en-IN')})`;
+                        toAccountDropdown.appendChild(option);
+                    });
+            }
+            
+            // Hide transfer summary when source account changes
+            document.getElementById('transfer-summary').style.display = 'none';
+        }
+        
+        function previewTransfer() {
+            const fromAccountId = document.getElementById('transfer-from-account').value;
+            const toAccountId = document.getElementById('transfer-to-account').value;
+            const amount = parseFloat(document.getElementById('transfer-amount').value);
+            const description = document.getElementById('transfer-description').value;
+            
+            if (!fromAccountId || !toAccountId || !amount || amount <= 0) {
+                alert('Please fill in all required fields with valid values');
+                return;
+            }
+            
+            if (fromAccountId === toAccountId) {
+                alert('Source and destination accounts must be different');
+                return;
+            }
+            
+            const fromAccount = financeData.accounts.find(acc => acc.id == fromAccountId);
+            const toAccount = financeData.accounts.find(acc => acc.id == toAccountId);
+            
+            if (!fromAccount || !toAccount) {
+                alert('Selected accounts not found');
+                return;
+            }
+            
+            // Check if source account has sufficient balance (except credit cards)
+            if (fromAccount.type !== 'credit' && fromAccount.balance < amount) {
+                alert(`Insufficient balance in ${fromAccount.name}. Available: ₹${fromAccount.balance.toLocaleString('en-IN')}, Required: ₹${amount.toLocaleString('en-IN')}`);
+                return;
+            }
+            
+            // Calculate new balances
+            let fromNewBalance, toNewBalance;
+            
+            if (fromAccount.type === 'credit') {
+                fromNewBalance = fromAccount.balance + amount; // Credit card: transfer increases debt
+            } else {
+                fromNewBalance = fromAccount.balance - amount; // Regular account: transfer decreases balance
+            }
+            
+            if (toAccount.type === 'credit') {
+                toNewBalance = toAccount.balance - amount; // Credit card: receiving money reduces debt
+            } else {
+                toNewBalance = toAccount.balance + amount; // Regular account: receiving money increases balance
+            }
+            
+            // Show transfer summary
+            const detailsHTML = `
+                <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 16px; margin-bottom: 12px;">
+                    <div>
+                        <strong>From: ${fromAccount.name}</strong><br>
+                        <small>Current: ₹${fromAccount.balance.toLocaleString('en-IN')}</small><br>
+                        <small style="color: ${fromNewBalance >= 0 ? '#10b981' : '#ef4444'};">After: ₹${fromNewBalance.toLocaleString('en-IN')}</small>
+                    </div>
+                    <div>
+                        <strong>To: ${toAccount.name}</strong><br>
+                        <small>Current: ₹${toAccount.balance.toLocaleString('en-IN')}</small><br>
+                        <small style="color: ${toNewBalance >= 0 ? '#10b981' : '#ef4444'};">After: ₹${toNewBalance.toLocaleString('en-IN')}</small>
+                    </div>
+                </div>
+                <div style="text-align: center; padding: 8px; background: white; border-radius: 8px;">
+                    <strong>Transfer Amount: ₹${amount.toLocaleString('en-IN')}</strong>
+                    ${description ? `<br><small>Description: ${description}</small>` : ''}
+                </div>
+            `;
+            
+            document.getElementById('transfer-details').innerHTML = detailsHTML;
+            document.getElementById('transfer-summary').style.display = 'block';
+        }
+        
+        function executeTransfer() {
+            const fromAccountId = document.getElementById('transfer-from-account').value;
+            const toAccountId = document.getElementById('transfer-to-account').value;
+            const amount = parseFloat(document.getElementById('transfer-amount').value);
+            const description = document.getElementById('transfer-description').value || 'Account Transfer';
+            
+            if (!fromAccountId || !toAccountId || !amount || amount <= 0) {
+                alert('Please preview the transfer first to ensure all details are correct');
+                return;
+            }
+            
+            if (fromAccountId === toAccountId) {
+                alert('Source and destination accounts must be different');
+                return;
+            }
+            
+            const fromAccount = financeData.accounts.find(acc => acc.id == fromAccountId);
+            const toAccount = financeData.accounts.find(acc => acc.id == toAccountId);
+            
+            if (!fromAccount || !toAccount) {
+                alert('Selected accounts not found');
+                return;
+            }
+            
+            // Final balance check
+            if (fromAccount.type !== 'credit' && fromAccount.balance < amount) {
+                alert(`Insufficient balance in ${fromAccount.name}`);
+                return;
+            }
+            
+            if (!confirm(`Confirm transfer of ₹${amount.toLocaleString('en-IN')} from ${fromAccount.name} to ${toAccount.name}?`)) {
+                return;
+            }
+            
+            // Execute the transfer
+            const transferId = Date.now();
+            const transferDate = new Date().toISOString().split('T')[0];
+            const timestamp = new Date().toISOString();
+            
+            // Update source account balance
+            if (fromAccount.type === 'credit') {
+                fromAccount.balance += amount;
+            } else {
+                fromAccount.balance -= amount;
+            }
+            fromAccount.lastUpdated = timestamp;
+            
+            // Update destination account balance
+            if (toAccount.type === 'credit') {
+                toAccount.balance -= amount;
+            } else {
+                toAccount.balance += amount;
+            }
+            toAccount.lastUpdated = timestamp;
+            
+            // Create transfer record for source account (money going out)
+            const transferExpenseRecord = {
+                id: transferId + 1,
+                category: 'transfer',
+                amount: amount,
+                date: transferDate,
+                accountId: parseInt(fromAccountId),
+                accountName: fromAccount.name,
+                description: `Transfer to ${toAccount.name} - ${description}`,
+                timestamp: timestamp,
+                transferId: transferId,
+                isTransfer: true  // Flag to identify transfer records
+            };
+            
+            // Add only the expense record for transfers - no income record needed
+            // Transfers are just movements of money between accounts, not income
+            financeData.expenses.push(transferExpenseRecord);
+            
+            // Save and update displays
+            saveData();
+            updateAllDisplaysRealTime();
+            
+            // Clear form and close modal
+            document.getElementById('transfer-from-account').selectedIndex = 0;
+            document.getElementById('transfer-to-account').selectedIndex = 0;
+            document.getElementById('transfer-amount').value = '';
+            document.getElementById('transfer-description').value = '';
+            document.getElementById('transfer-summary').style.display = 'none';
+            
+            closeModal();
+            
+            showAlert(`Transfer successful! ₹${amount.toLocaleString('en-IN')} transferred from ${fromAccount.name} to ${toAccount.name}`, 'success');
+        }
+
+        // Year-wise Analysis Functions
+        function updateYearwiseAnalysis() {
+            populateYearDropdown();
+            updateYearAnalysis();
+        }
+
+        function populateYearDropdown() {
+            const yearSelect = document.getElementById('analysis-year');
+            if (!yearSelect) return;
+
+            const years = new Set();
+            financeData.expenses.forEach(expense => {
+                if (!expense.isTransfer) {  // Only include non-transfer expenses
+                    years.add(new Date(expense.date).getFullYear());
+                }
+            });
+
+            const currentYear = new Date().getFullYear();
+            years.add(currentYear);
+
+            const sortedYears = Array.from(years).sort((a, b) => b - a);
+            yearSelect.innerHTML = sortedYears.map(year => 
+                `<option value="${year}" ${year === currentYear ? 'selected' : ''}>${year}</option>`
+            ).join('');
+        }
+
+        function updateYearAnalysis() {
+            const selectedYear = parseInt(document.getElementById('analysis-year')?.value) || new Date().getFullYear();
+            
+            // Filter expenses for selected year, excluding transfers
+            const yearExpenses = financeData.expenses.filter(expense => 
+                new Date(expense.date).getFullYear() === selectedYear && !expense.isTransfer
+            );
+
+            updateYearSummary(yearExpenses, selectedYear);
+            updateMonthlyBreakdown(yearExpenses, selectedYear);
+            updateTopExpenses(yearExpenses);
+            createYearlyCharts(yearExpenses, selectedYear);
+        }
+
+        function updateYearSummary(expenses, year) {
+            const totalExpense = expenses.reduce((sum, expense) => sum + expense.amount, 0);
+            const avgMonthly = totalExpense / 12;
+
+            // Calculate monthly totals
+            const monthlyTotals = Array(12).fill(0);
+            expenses.forEach(expense => {
+                const month = new Date(expense.date).getMonth();
+                monthlyTotals[month] += expense.amount;
+            });
+
+            const highestMonthIndex = monthlyTotals.indexOf(Math.max(...monthlyTotals));
+            const monthNames = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'];
+
+            // Calculate category totals
+            const categoryTotals = {};
+            expenses.forEach(expense => {
+                categoryTotals[expense.category] = (categoryTotals[expense.category] || 0) + expense.amount;
+            });
+
+            const topCategory = Object.keys(categoryTotals).reduce((a, b) => 
+                categoryTotals[a] > categoryTotals[b] ? a : b, Object.keys(categoryTotals)[0] || 'None'
+            );
+
+            // Update display
+            document.getElementById('year-total-expense').textContent = `₹${totalExpense.toLocaleString('en-IN')}`;
+            document.getElementById('year-avg-monthly').textContent = `₹${avgMonthly.toLocaleString('en-IN', {maximumFractionDigits: 0})}`;
+            document.getElementById('year-highest-month').textContent = monthlyTotals[highestMonthIndex] > 0 ? monthNames[highestMonthIndex] : '--';
+            document.getElementById('year-top-category').textContent = topCategory;
+            document.getElementById('year-category-count').textContent = Object.keys(categoryTotals).length;
+        }
+
+        function updateMonthlyBreakdown(expenses, year) {
+            const container = document.getElementById('monthly-breakdown');
+            const monthNames = ['January', 'February', 'March', 'April', 'May', 'June', 
+                               'July', 'August', 'September', 'October', 'November', 'December'];
+
+            if (expenses.length === 0) {
+                container.innerHTML = `
+                    <div class="empty-state">
+                        <i class="fas fa-calendar-alt"></i>
+                        <h3>No expense data</h3>
+                        <p>Add some expenses to see monthly breakdown</p>
+                    </div>
+                `;
+                return;
+            }
+
+            const monthlyData = Array(12).fill(0).map((_, index) => {
+                const monthExpenses = expenses.filter(expense => 
+                    new Date(expense.date).getMonth() === index && !expense.isTransfer
+                );
+                
+                const total = monthExpenses.reduce((sum, expense) => sum + expense.amount, 0);
+                const categoryTotals = {};
+                
+                monthExpenses.forEach(expense => {
+                    categoryTotals[expense.category] = (categoryTotals[expense.category] || 0) + expense.amount;
+                });
+                
+                const topCategory = Object.keys(categoryTotals).reduce((a, b) => 
+                    categoryTotals[a] > categoryTotals[b] ? a : b, Object.keys(categoryTotals)[0] || 'None'
+                );
+
+                return {
+                    month: monthNames[index],
+                    total,
+                    topCategory,
+                    transactionCount: monthExpenses.length,
+                    previousMonth: index > 0 ? Array(12).fill(0).map((_, i) => 
+                        expenses.filter(e => new Date(e.date).getMonth() === i && !e.isTransfer)
+                                .reduce((s, e) => s + e.amount, 0)
+                    )[index - 1] : 0
+                };
+            });
+
+            container.innerHTML = monthlyData.map((data, index) => {
+                const changePercent = data.previousMonth > 0 
+                    ? ((data.total - data.previousMonth) / data.previousMonth * 100).toFixed(1)
+                    : data.total > 0 ? '+100' : '0';
+                const changeColor = parseFloat(changePercent) > 0 ? '#ef4444' : '#10b981';
+                const changeIcon = parseFloat(changePercent) > 0 ? 'fa-arrow-up' : 'fa-arrow-down';
+
+                return `
+                    <div class="table-row">
+                        <div><strong>${data.month}</strong></div>
+                        <div class="stat-value" style="font-size: 16px; color: #ef4444;">₹${data.total.toLocaleString('en-IN')}</div>
+                        <div><span class="badge badge-expense">${data.topCategory}</span></div>
+                        <div>${data.transactionCount}</div>
+                        <div style="color: ${changeColor};">
+                            <i class="fas ${changeIcon}"></i> ${Math.abs(parseFloat(changePercent))}%
+                        </div>
+                    </div>
+                `;
+            }).join('');
+        }
+
+        function updateTopExpenses(expenses) {
+            const container = document.getElementById('top-expenses');
+            
+            // Filter out transfer records
+            const nonTransferExpenses = expenses.filter(expense => !expense.isTransfer);
+            
+            if (nonTransferExpenses.length === 0) {
+                container.innerHTML = `
+                    <div class="empty-state">
+                        <i class="fas fa-receipt"></i>
+                        <h3>No expenses recorded</h3>
+                        <p>Start adding expenses to see top spending analysis</p>
+                    </div>
+                `;
+                return;
+            }
+
+            const totalExpense = nonTransferExpenses.reduce((sum, expense) => sum + expense.amount, 0);
+            const topExpenses = nonTransferExpenses
+                .sort((a, b) => b.amount - a.amount)
+                .slice(0, 10);
+
+            container.innerHTML = topExpenses.map(expense => {
+                const percentage = ((expense.amount / totalExpense) * 100).toFixed(1);
+                
+                return `
+                    <div class="table-row">
+                        <div><strong>${expense.description}</strong></div>
+                        <div><span class="badge badge-expense">${expense.category}</span></div>
+                        <div class="stat-value" style="font-size: 16px; color: #ef4444;">₹${expense.amount.toLocaleString('en-IN')}</div>
+                        <div>${new Date(expense.date).toLocaleDateString('en-IN')}</div>
+                        <div><strong>${percentage}%</strong></div>
+                    </div>
+                `;
+            }).join('');
+        }
+
+        function createYearlyCharts(expenses, year) {
+            createYearlyTrendChart(expenses);
+            createYearlyCategoryChart(expenses);
+            createYearComparisonChart(year);
+            createExpenseForecastChart(expenses);
+        }
+
+        function createYearlyTrendChart(expenses) {
+            const ctx = document.getElementById('yearly-trend-chart');
+            if (!ctx) return;
+
+            const chart = Chart.getChart(ctx);
+            if (chart) chart.destroy();
+
+            const monthNames = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'];
+            const monthlyData = Array(12).fill(0);
+
+            expenses
+                .filter(expense => !expense.isTransfer)  // Exclude transfer records
+                .forEach(expense => {
+                    const month = new Date(expense.date).getMonth();
+                    monthlyData[month] += expense.amount;
+                });
+
+            new Chart(ctx, {
+                type: 'line',
+                data: {
+                    labels: monthNames,
+                    datasets: [{
+                        label: 'Monthly Expenses',
+                        data: monthlyData,
+                        borderColor: '#ef4444',
+                        backgroundColor: 'rgba(239, 68, 68, 0.1)',
+                        tension: 0.4,
+                        fill: true
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    plugins: {
+                        legend: {
+                            display: false
+                        }
+                    },
+                    scales: {
+                        y: {
+                            beginAtZero: true,
+                            ticks: {
+                                callback: function(value) {
+                                    return '₹' + value.toLocaleString('en-IN');
+                                }
+                            }
+                        }
+                    }
+                }
+            });
+        }
+
+        function createYearlyCategoryChart(expenses) {
+            const ctx = document.getElementById('yearly-category-chart');
+            if (!ctx) return;
+
+            const chart = Chart.getChart(ctx);
+            if (chart) chart.destroy();
+
+            const categoryTotals = {};
+            expenses
+                .filter(expense => !expense.isTransfer)  // Exclude transfer records
+                .forEach(expense => {
+                    categoryTotals[expense.category] = (categoryTotals[expense.category] || 0) + expense.amount;
+                });
+
+            const categories = Object.keys(categoryTotals);
+            const amounts = Object.values(categoryTotals);
+            const colors = [
+                '#ff6384', '#36a2eb', '#ffce56', '#4bc0c0', '#9966ff',
+                '#ff9f40', '#ff6384', '#c9cbcf', '#4bc0c0', '#36a2eb'
+            ];
+
+            new Chart(ctx, {
+                type: 'doughnut',
+                data: {
+                    labels: categories,
+                    datasets: [{
+                        data: amounts,
+                        backgroundColor: colors.slice(0, categories.length),
+                        borderWidth: 2,
+                        borderColor: '#fff'
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    plugins: {
+                        legend: {
+                            position: 'bottom'
+                        }
+                    }
+                }
+            });
+        }
+
+        function createYearComparisonChart(currentYear) {
+            const ctx = document.getElementById('year-comparison-chart');
+            if (!ctx) return;
+
+            const chart = Chart.getChart(ctx);
+            if (chart) chart.destroy();
+
+            const years = [currentYear - 2, currentYear - 1, currentYear];
+            const yearlyTotals = years.map(year => {
+                return financeData.expenses
+                    .filter(expense => new Date(expense.date).getFullYear() === year && !expense.isTransfer)
+                    .reduce((sum, expense) => sum + expense.amount, 0);
+            });
+
+            new Chart(ctx, {
+                type: 'bar',
+                data: {
+                    labels: years,
+                    datasets: [{
+                        label: 'Total Expenses',
+                        data: yearlyTotals,
+                        backgroundColor: '#ef4444',
+                        borderColor: '#dc2626',
+                        borderWidth: 1
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    plugins: {
+                        legend: {
+                            display: false
+                        }
+                    },
+                    scales: {
+                        y: {
+                            beginAtZero: true,
+                            ticks: {
+                                callback: function(value) {
+                                    return '₹' + value.toLocaleString('en-IN');
+                                }
+                            }
+                        }
+                    }
+                }
+            });
+        }
+
+        function createExpenseForecastChart(expenses) {
+            const ctx = document.getElementById('expense-forecast-chart');
+            if (!ctx) return;
+
+            const chart = Chart.getChart(ctx);
+            if (chart) chart.destroy();
+
+            const monthNames = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'];
+            const currentMonth = new Date().getMonth();
+            const monthlyData = Array(12).fill(0);
+
+            expenses
+                .filter(expense => !expense.isTransfer)  // Exclude transfer records
+                .forEach(expense => {
+                    const month = new Date(expense.date).getMonth();
+                    monthlyData[month] += expense.amount;
+                });
+
+            // Calculate average for forecasting
+            const actualMonths = monthlyData.slice(0, currentMonth + 1);
+            const avgExpense = actualMonths.reduce((sum, val) => sum + val, 0) / (currentMonth + 1);
+
+            // Create forecast data
+            const forecastData = monthlyData.map((actual, index) => {
+                return index <= currentMonth ? actual : avgExpense;
+            });
+
+            new Chart(ctx, {
+                type: 'line',
+                data: {
+                    labels: monthNames,
+                    datasets: [
+                        {
+                            label: 'Actual Expenses',
+                            data: monthlyData.map((val, index) => index <= currentMonth ? val : null),
+                            borderColor: '#ef4444',
+                            backgroundColor: 'rgba(239, 68, 68, 0.1)',
+                            tension: 0.4
+                        },
+                        {
+                            label: 'Forecasted Expenses',
+                            data: forecastData.map((val, index) => index > currentMonth ? val : null),
+                            borderColor: '#6b7280',
+                            backgroundColor: 'rgba(107, 114, 128, 0.1)',
+                            borderDash: [5, 5],
+                            tension: 0.4
+                        }
+                    ]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    scales: {
+                        y: {
+                            beginAtZero: true,
+                            ticks: {
+                                callback: function(value) {
+                                    return '₹' + value.toLocaleString('en-IN');
+                                }
+                            }
+                        }
+                    }
+                }
+            });
+        }
+
+        function generateYearReport() {
+            const selectedYear = parseInt(document.getElementById('analysis-year')?.value) || new Date().getFullYear();
+            const yearExpenses = financeData.expenses.filter(expense => 
+                new Date(expense.date).getFullYear() === selectedYear && !expense.isTransfer
+            );
+
+            const totalExpense = yearExpenses.reduce((sum, expense) => sum + expense.amount, 0);
+            
+            // Create a simple text report
+            const report = `
+YEARLY EXPENSE REPORT - ${selectedYear}
+${'='.repeat(40)}
+
+Total Expenses: ₹${totalExpense.toLocaleString('en-IN')}
+Number of Transactions: ${yearExpenses.length}
+Average Monthly Expense: ₹${(totalExpense/12).toLocaleString('en-IN', {maximumFractionDigits: 0})}
+
+Generated on: ${new Date().toLocaleDateString('en-IN')}
+`;
+
+            // Download as text file
+            const dataBlob = new Blob([report], { type: 'text/plain' });
+            const url = URL.createObjectURL(dataBlob);
+            const link = document.createElement('a');
+            link.href = url;
+            link.download = `expense-report-${selectedYear}.txt`;
+            document.body.appendChild(link);
+            link.click();
+            document.body.removeChild(link);
+            URL.revokeObjectURL(url);
+            
+            showAlert('Report generated successfully!', 'success');
+        }
+
+        function exportYearData() {
+            const selectedYear = parseInt(document.getElementById('analysis-year')?.value) || new Date().getFullYear();
+            const yearData = {
+                year: selectedYear,
+                expenses: financeData.expenses.filter(expense => 
+                    new Date(expense.date).getFullYear() === selectedYear && !expense.isTransfer
+                ),
+                incomes: financeData.incomes.filter(income => 
+                    new Date(income.date).getFullYear() === selectedYear
+                ),
+                exportDate: new Date().toISOString()
+            };
+
+            const dataStr = JSON.stringify(yearData, null, 2);
+            const dataBlob = new Blob([dataStr], { type: 'application/json' });
+            const url = URL.createObjectURL(dataBlob);
+            const link = document.createElement('a');
+            link.href = url;
+            link.download = `finance-data-${selectedYear}.json`;
+            document.body.appendChild(link);
+            link.click();
+            document.body.removeChild(link);
+            URL.revokeObjectURL(url);
+            
+            showAlert(`${selectedYear} data exported successfully!`, 'success');
+        }
+
+        // Add keyboard support for forms
+        function addKeyboardSupport() {
+            // Income form
+            document.getElementById('income-amount')?.addEventListener('keypress', function(e) {
+                if (e.key === 'Enter') {
+                    addIncome();
+                }
+            });
+
+            // Expense form
+            document.getElementById('expense-amount')?.addEventListener('keypress', function(e) {
+                if (e.key === 'Enter') {
+                    addExpense();
+                }
+            });
+
+            // Subscription form
+            document.getElementById('subscription-cost')?.addEventListener('keypress', function(e) {
+                if (e.key === 'Enter') {
+                    addSubscription();
+                }
+            });
+
+            // Goal form
+            document.getElementById('goal-target')?.addEventListener('keypress', function(e) {
+                if (e.key === 'Enter') {
+                    addGoal();
+                }
+            });
+
+            // Modal forms
+            document.getElementById('modal-income-amount')?.addEventListener('keypress', function(e) {
+                if (e.key === 'Enter') {
+                    addModalIncome();
+                }
+            });
+
+            document.getElementById('modal-expense-amount')?.addEventListener('keypress', function(e) {
+                if (e.key === 'Enter') {
+                    addModalExpense();
+                }
+            });
+
+            document.getElementById('modal-subscription-cost')?.addEventListener('keypress', function(e) {
+                if (e.key === 'Enter') {
+                    addModalSubscription();
+                }
+            });
+
+            document.getElementById('modal-goal-target')?.addEventListener('keypress', function(e) {
+                if (e.key === 'Enter') {
+                    addModalGoal();
+                }
+            });
+
+            // Account form
+            document.getElementById('account-balance')?.addEventListener('keypress', function(e) {
+                if (e.key === 'Enter') {
+                    addAccount();
+                }
+            });
+        }
+
+        // Initialize the application
+        window.addEventListener('load', init);
+        
+        // Close modals when clicking outside
+        window.addEventListener('click', function(event) {
+            if (event.target.classList.contains('modal')) {
+                closeModal();
+            }
+        });
+    </script>
+</body>
+</html>
